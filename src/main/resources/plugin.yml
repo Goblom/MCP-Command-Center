@@ -1,0 +1,4 @@
+main: codes.goblom.mcpai.McpPlugin
+version: ${project.version}
+name: ${project.artifactId}
+api-version: '1.20'
