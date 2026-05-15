@@ -77,6 +77,12 @@ public class InputSchemaBuilder {
         type(type);
     }
     
+    public InputSchemaBuilder override(String name, Object object) {
+        this.schema.put(name, object);
+        
+        return this;
+    }
+    
     public InputSchemaBuilder type(ParameterType type) {
         this.schema.put("type", type.toString());
         
