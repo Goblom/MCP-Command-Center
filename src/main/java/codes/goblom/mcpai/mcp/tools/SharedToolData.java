@@ -24,9 +24,13 @@
 package codes.goblom.mcpai.mcp.tools;
 
 import codes.goblom.mcpai.WrappedCommandSender;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
+import org.bukkit.inventory.ItemStack;
 
 /**
  *
@@ -57,5 +61,15 @@ public class SharedToolData {
 
         @Override
         public void close() { }
+    };
+    
+    public static final List<Material> AVAILABLE_BLOCKS = new ArrayList() {
+        {
+            for (Material mat : Material.values()) {
+                if (mat.isBlock() && !mat.name().startsWith(Material.LEGACY_PREFIX)) {
+                    add(mat);
+                }
+            }
+        }
     };
 }

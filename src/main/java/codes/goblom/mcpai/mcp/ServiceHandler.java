@@ -62,8 +62,12 @@ public class ServiceHandler {
             
             add(new ShutdownServer());
             add(new ExecuteCommand());
+            add(new GetServerVersion());
             
             add(new CreateWorld());
+            add(new GetBlockTypes());
+            add(new SetBlock());
+            add(new FillArea());
             
             add(new ListDirectory());
             add(new ReadFile());
