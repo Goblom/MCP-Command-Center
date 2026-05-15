@@ -63,7 +63,7 @@ public class ServiceHandler {
             add(new ShutdownServer());
             add(new ExecuteCommand());
             add(new GetServerVersion());
-//            add(new GetLog());
+            add(new GetLog());
             
             add(new CreateWorld());
             add(new GetBlockTypes());
