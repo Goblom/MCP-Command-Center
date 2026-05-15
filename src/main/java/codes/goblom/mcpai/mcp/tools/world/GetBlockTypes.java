@@ -23,6 +23,7 @@
  */
 package codes.goblom.mcpai.mcp.tools.world;
 
+import codes.goblom.mcpai.mcp.InputSchemaBuilder;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.tools.SharedToolData;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
@@ -34,10 +35,15 @@ import io.modelcontextprotocol.spec.McpSchema;
  */
 public class GetBlockTypes extends ToolProvider {
     
+    static final String INPUT_SCHEMA = InputSchemaBuilder.builder()
+//            .id("urn:jsonschema:Operation")
+            .toJson();
+    
     public GetBlockTypes() {
         super(
                 "get_block_types",
-                "Get a list of all available BlockTypes on the server."
+                "Get a list of all available BlockTypes on the server.",
+                INPUT_SCHEMA
         );
     }
 

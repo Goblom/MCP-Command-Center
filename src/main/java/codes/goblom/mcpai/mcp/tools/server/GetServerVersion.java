@@ -35,12 +35,13 @@ import org.bukkit.Bukkit;
  */
 public class GetServerVersion extends ToolProvider {
     
-    private static final String INPUT_SCHEMA = InputSchemaBuilder.builder().toJson();
+    private static final String INPUT_SCHEMA = InputSchemaBuilder.builder(InputSchemaBuilder.ParameterType.Object).toJson();
     
     public GetServerVersion() {
         super(
                 "get_server_version",
-                "Returns the minecraft server version that the server is running."
+                "Returns the minecraft server version that the server is running.",
+                INPUT_SCHEMA
         );
     }
 

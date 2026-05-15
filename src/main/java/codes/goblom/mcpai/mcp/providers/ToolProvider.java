@@ -62,7 +62,6 @@ public abstract class ToolProvider implements ServiceProvider<McpSchema.CallTool
     private String inputSchema;
     
     public ToolProvider(String description) {
-        this.name = null;
         this.description = description;
     }
     
