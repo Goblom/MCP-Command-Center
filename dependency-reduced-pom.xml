@@ -33,23 +33,7 @@
         </executions>
         <configuration>
           <artifactSet>
-            <includes>
-              <include>io.modelcontextprotocol.sdk:mcp-core</include>
-              <include>io.modelcontextprotocol.sdk:mcp-json-jackson3</include>
-              <include>tools.jackson.core:jackson-core</include>
-              <include>tools.jackson.core:jackson-databind</include>
-              <include>com.fasterxml.jackson.core:jackson-annotations</include>
-              <include>io.projectreactor:reactor-core</include>
-              <include>org.reactivestreams:reactive-streams</include>
-              <include>com.networknt:json-schema-validator</include>
-              <include>jakarta.servlet:jakarta.servlet-api</include>
-              <include>org.eclipse.jetty:jetty-server</include>
-              <include>org.eclipse.jetty:jetty-servlet</include>
-              <include>org.eclipse.jetty:jetty-util</include>
-              <include>org.eclipse.jetty:jetty-http</include>
-              <include>org.eclipse.jetty:jetty-io</include>
-              <include>org.eclipse.jetty:jetty-security</include>
-            </includes>
+            <includes />
           </artifactSet>
         </configuration>
       </plugin>
@@ -62,14 +46,6 @@
       </plugin>
     </plugins>
   </build>
-  <dependencies>
-    <dependency>
-      <groupId>org.spigotmc</groupId>
-      <artifactId>spigot-api</artifactId>
-      <version>26.1.2-R0.1-SNAPSHOT</version>
-      <scope>compile</scope>
-    </dependency>
-  </dependencies>
   <properties>
     <maven.compiler.release>25</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
