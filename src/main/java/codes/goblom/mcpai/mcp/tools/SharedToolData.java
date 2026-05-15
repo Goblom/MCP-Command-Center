@@ -24,6 +24,7 @@
 package codes.goblom.mcpai.mcp.tools;
 
 import codes.goblom.mcpai.WrappedCommandSender;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Handler;
@@ -38,6 +39,8 @@ import org.bukkit.inventory.ItemStack;
  */
 public class SharedToolData {
     
+    public static final Path SERVER_DIR = Path.of(Bukkit.getWorldContainer().toURI()).normalize();
+
     public static final WrappedCommandSender COMMAND_SENDER = new WrappedCommandSender(Bukkit.getConsoleSender());
     
     public static final Handler LOG_HANDLER = new Handler() {

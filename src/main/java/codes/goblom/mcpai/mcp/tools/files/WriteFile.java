@@ -26,6 +26,7 @@ package codes.goblom.mcpai.mcp.tools.files;
 import codes.goblom.mcpai.Configuration;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.tools.SharedToolData;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.nio.charset.StandardCharsets;
@@ -62,9 +63,9 @@ public class WriteFile extends ToolProvider {
         String fileContent = (String) request.arguments().get("fileContent");
         boolean overrideFile = (boolean) request.arguments().getOrDefault("overrideFile", true);
         
-        Path path = Configuration.SERVER_DIR.resolve(pathStr).normalize();
+        Path path = SharedToolData.SERVER_DIR.resolve(pathStr).normalize();
         
-        if (!path.startsWith(Configuration.SERVER_DIR)) {
+        if (!path.startsWith(SharedToolData.SERVER_DIR)) {
             return McpSchema.CallToolResult.builder()
                     .isError(true)
                     .addTextContent("Error: File outside server root.")

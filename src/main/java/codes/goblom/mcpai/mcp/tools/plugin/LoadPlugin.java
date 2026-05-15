@@ -23,9 +23,9 @@
  */
 package codes.goblom.mcpai.mcp.tools.plugin;
 
-import codes.goblom.mcpai.Configuration;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.tools.SharedToolData;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.io.File;
@@ -59,7 +59,7 @@ public class LoadPlugin extends ToolProvider {
             return McpSchema.CallToolResult.builder().isError(true).addTextContent("Error: fileName parameter is empty").build();
         }
         
-        File file = new File(Configuration.SERVER_DIR.toFile(), "/plugins/" + fileName);
+        File file = new File(SharedToolData.SERVER_DIR.toFile(), "/plugins/" + fileName);
         if (!file.exists()) {
             return McpSchema.CallToolResult.builder().isError(true).addTextContent("Error: " + fileName + " does not exist.").build();
         }

@@ -26,6 +26,7 @@ package codes.goblom.mcpai.mcp.tools.files;
 import codes.goblom.mcpai.Configuration;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.tools.SharedToolData;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.io.IOException;
@@ -112,12 +113,12 @@ public class ListDirectory extends ToolProvider {
                 || searchPathStr.equalsIgnoreCase("server")
                 || searchPathStr.equalsIgnoreCase("/")
                 || searchPathStr.equalsIgnoreCase("C:\\")
-                ? Configuration.SERVER_DIR
-                : Configuration.SERVER_DIR.resolve(searchPathStr).normalize();
+                ? SharedToolData.SERVER_DIR
+                : SharedToolData.SERVER_DIR.resolve(searchPathStr).normalize();
 
         Configuration.PLUGIN.debug(Level.INFO, "Looking at path {0}", searchPath);
 
-        if (!searchPath.startsWith(Configuration.SERVER_DIR)) {
+        if (!searchPath.startsWith(SharedToolData.SERVER_DIR)) {
             return McpSchema.CallToolResult.builder()
                     .isError(true)
                     .addTextContent("Access is denied. Outside of server folder.")

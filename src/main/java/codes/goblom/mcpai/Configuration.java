@@ -24,12 +24,10 @@
 package codes.goblom.mcpai;
 
 import com.google.common.collect.Lists;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import org.bukkit.Bukkit;
 
 /**
  *
@@ -41,7 +39,6 @@ public class Configuration {
     public static String MCP_PATH = "/mcp";
     public static boolean DEBUG = true;
     public static Random RANDOM = new Random();
-    public static final Path SERVER_DIR = Path.of(Bukkit.getWorldContainer().toURI()).normalize();
 
     public static Map<String, List<String>> TOKEN_PERMISSIONS = new HashMap<String, List<String>>() {
         {
