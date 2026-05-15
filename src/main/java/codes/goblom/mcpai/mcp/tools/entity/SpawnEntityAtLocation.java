@@ -21,65 +21,53 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package codes.goblom.mcpai.mcp.services;
+package codes.goblom.mcpai.mcp.tools.entity;
 
 import codes.goblom.mcpai.Configuration;
+import codes.goblom.mcpai.mcp.providers.ToolProvider;
+import codes.goblom.mcpai.mcp.InputSchemaBuilder;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeoutException;
+import java.util.ArrayList;
+import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
-import codes.goblom.mcpai.mcp.McpServiceProvider;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
  * @author Bryan
  */
-public class EntityServices implements McpServiceProvider {
+public class SpawnEntityAtLocation extends ToolProvider {
     
-    private static final List<EntityType> DISALLOWED_ENTITY_TYPES = new ArrayList(){
-        {
-            add(EntityType.PLAYER);
-            add(EntityType.UNKNOWN);
-        }
-    };
+    private static final String INPUT_SCHEMA = InputSchemaBuilder.builder()
+            .addRequiredProperty("loc-world", InputSchemaBuilder.ParameterType.String)
+            .addRequiredProperty("loc-x", InputSchemaBuilder.ParameterType.Number)
+            .addRequiredProperty("loc-y", InputSchemaBuilder.ParameterType.Number)
+            .addRequiredProperty("loc-z", InputSchemaBuilder.ParameterType.Number)
+            .addRequiredProperty("entityType", InputSchemaBuilder.ParameterType.String)
+            .addOptionalProperty("randomizeData", InputSchemaBuilder.ParameterType.Boolean)
+            .toJson();
     
-    @Tool(
-            name = "spawn_entity_at_location",
-            description = 
-                    """
-                    Spawn an entity at a given location with given entity type.
-                    
-                    Entity Rules:
-                    - Entity type must match to an option in the enum class org.bukkit.entity.EntityType
-                    - Location must include the world and if no x, y, z coordinates set them to 0
-                    - If the user specifies randomized data add "randomizeData" to the properties
-                    """,
-            inputSchema = 
-                    """
-                    {
-                        "type": "object",
-                        "required": ["loc-world", "loc-x", "loc-y", "loc-z", "entityType"],
-                        "properties": {
-                            "loc-world": { "type": "string" },
-                            "loc-x": { "type": "number" },
-                            "loc-y": { "type": "number" },
-                            "loc-z": { "type": "number" },
-                            "entityType": { "type": "string" },
-                            "randomizeData": { "type": "boolean" }
-                        }
-                    }
-                    """,
-            requiresSyncMethod = true
-            
-    )
-    public McpSchema.CallToolResult spawnEntityAtLocation(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws InterruptedException, ExecutionException, TimeoutException {
+    public SpawnEntityAtLocation() {
+        super(
+                "spawn_entity_at_location",
+                """
+                Spawn an entity at a given location with given entity type.
+                                    
+                Entity Rules:
+                - Entity type must match to an option in the enum class org.bukkit.entity.EntityType
+                - Location must include the world and if no x, y, z coordinates set them to 0
+                - If the user specifies randomized data add "randomizeData" to the properties
+                """,
+                INPUT_SCHEMA);
+    }
+    
+    @Override
+    @RequireSyncMethod
+    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
         String worldName = (String) request.arguments().get("loc-world");
         double x = Double.parseDouble(request.arguments().get("loc-x").toString());
         double y = Double.parseDouble(request.arguments().get("loc-y").toString());
@@ -95,7 +83,7 @@ public class EntityServices implements McpServiceProvider {
                     .build();
         }
         
-        if (DISALLOWED_ENTITY_TYPES.contains(entityType)) {
+        if (GetEntityTypes.DISALLOWED_ENTITY_TYPES.contains(entityType)) {
             return McpSchema.CallToolResult.builder()
                     .isError(true)
                     .addTextContent("Error: Entity type " + entityType + " is not allowed.")
@@ -116,35 +104,6 @@ public class EntityServices implements McpServiceProvider {
 
         return McpSchema.CallToolResult.builder()
                     .addTextContent("Success! Spawned entity at " + entity.getLocation().toString())
-                    .build();
-        
-    }
+                    .build();    }
     
-    @Tool(
-            name = "get_available_entity_types",
-            description = "Get a list of all EntityTypes available on the server.",
-            inputSchema = 
-                    """
-                    {
-                      "type" : "object",
-                      "id" : "urn:jsonschema:Operation",
-                      "properties" : {
-                        "operation" : {
-                          "type" : "string"
-                        }
-                      }
-                    }
-                    """
-    )
-    public McpSchema.CallToolResult getAvailableEntityTypes(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) {
-        McpSchema.CallToolResult.Builder builder = McpSchema.CallToolResult.builder();
-        
-        for (EntityType type : EntityType.values()) {
-            if (DISALLOWED_ENTITY_TYPES.contains(type)) continue; //Don't show the LLM types that arent allowed.
-            
-            builder.addTextContent(type.name().toLowerCase());
-        }
-        
-        return builder.build();
-    }
 }

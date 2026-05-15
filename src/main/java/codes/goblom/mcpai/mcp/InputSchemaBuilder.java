@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package codes.goblom.mcpai.utils;
+package codes.goblom.mcpai.mcp;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -33,13 +33,15 @@ import tools.jackson.databind.ObjectMapper;
  *
  * @author Bryan
  */
+
+//TODO: Convert addProperty to a PropertyBuilder
 public class InputSchemaBuilder {
     
-    public static InputSchemaBuilder newBuilder() {
+    public static InputSchemaBuilder builder() {
         return new InputSchemaBuilder();
     }
     
-    public static InputSchemaBuilder newBuilder(ParameterType type) {
+    public static InputSchemaBuilder builder(ParameterType type) {
         return new InputSchemaBuilder(type);
     }
     
@@ -64,7 +66,7 @@ public class InputSchemaBuilder {
     }
     
     private final Map<String, Object> schema = Maps.newHashMap();
-    private final Map<String, Object> properties = Maps.newHashMap();
+    private final Map<String, Map<String, String>> properties = Maps.newHashMap();
     private final List<String> required = Lists.newArrayList();
     
     private InputSchemaBuilder() {
@@ -77,6 +79,12 @@ public class InputSchemaBuilder {
     
     public InputSchemaBuilder type(ParameterType type) {
         this.schema.put("type", type.toString());
+        
+        return this;
+    }
+    
+    public InputSchemaBuilder id(String id) {
+        this.schema.put("id", id);
         
         return this;
     }
@@ -124,6 +132,19 @@ public class InputSchemaBuilder {
         return addProperty(false, name, type, description);
     }
     
+    public InputSchemaBuilder addPropertyDescription(String name, String description) {
+        Map<String, String> propertyMap = properties.get(name);
+        propertyMap.put("description", description);
+        return this;
+    }
+    
+    public InputSchemaBuilder addPropertyDefault(String name, Object def) {
+        Map<String, String> propertyMap = properties.get(name);
+        propertyMap.put("description", String.valueOf(def));
+        return this;
+    }
+    
+    
     private Map<String, Object> build() {
         this.schema.put("properties", this.properties);
         
@@ -144,5 +165,10 @@ public class InputSchemaBuilder {
         }
         
         return null;
+    }
+    
+    @Override
+    public String toString() {
+        return toJson();
     }
 }

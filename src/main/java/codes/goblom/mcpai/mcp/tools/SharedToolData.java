@@ -21,36 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package codes.goblom.mcpai;
+package codes.goblom.mcpai.mcp.tools;
 
-import com.google.common.collect.Lists;
-import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import codes.goblom.mcpai.WrappedCommandSender;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 import org.bukkit.Bukkit;
 
 /**
  *
  * @author Bryan
  */
-public class Configuration {
+public class SharedToolData {
     
-    public static int HTTP_PORT = 8080;
-    public static String MCP_PATH = "/mcp";
-    public static boolean DEBUG = true;
-    public static Random RANDOM = new Random();
-    public static final Path SERVER_DIR = Path.of(Bukkit.getWorldContainer().toURI()).normalize();
-
-    public static Map<String, List<String>> TOKEN_PERMISSIONS = new HashMap<String, List<String>>() {
-        {
-            put("super-secret-token", Lists.newArrayList("tools.all", "prompts.all"));
-            put("permissions-test", Lists.newArrayList("prompts.all", "tools.list_plugins", "tools.get_logged_in_players_name"));
+    public static final WrappedCommandSender COMMAND_SENDER = new WrappedCommandSender(Bukkit.getConsoleSender());
+    
+    public static final Handler LOG_HANDLER = new Handler() {
+        
+        StringBuilder logOutput = new StringBuilder();
+        
+        @Override
+        public void publish(LogRecord record) {
+            if (record == null) return;
+            
+            if (record.getMessage() != null) {
+                COMMAND_SENDER.sendMessage(record.getMessage()); //This may cause double Strings
+                this.logOutput.append(record.getMessage()).append("\n");
+            }
         }
+
+        @Override
+        public void flush() { 
+            this.logOutput = new StringBuilder();
+        }
+
+        @Override
+        public void close() { }
     };
-    
-    public static String MCP_CONSOLE_NAME = "[LLM]";
-    
-    public static McpPlugin PLUGIN;
 }

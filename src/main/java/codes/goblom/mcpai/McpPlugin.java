@@ -24,23 +24,14 @@
 package codes.goblom.mcpai;
 
 import codes.goblom.mcpai.mcp.ServiceHandler;
-import codes.goblom.mcpai.mcp.services.EntityServices;
-import codes.goblom.mcpai.mcp.services.FileServices;
-import codes.goblom.mcpai.mcp.services.PlayerServices;
-import codes.goblom.mcpai.mcp.services.PluginServices;
-import codes.goblom.mcpai.mcp.services.ServerServices;
-import codes.goblom.mcpai.mcp.services.WorldServices;
-import com.google.common.collect.Lists;
 import io.modelcontextprotocol.json.jackson3.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.json.schema.jackson3.DefaultJsonSchemaValidator;
 import io.modelcontextprotocol.server.McpServer;
-import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpSyncServer;
 import io.modelcontextprotocol.server.transport.HttpServletStreamableServerTransportProvider;
 import io.modelcontextprotocol.spec.McpSchema.ServerCapabilities;
 import jakarta.servlet.DispatcherType;
 import java.util.EnumSet;
-import java.util.List;
 import java.util.logging.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -50,7 +41,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import tools.jackson.databind.json.JsonMapper;
 import io.modelcontextprotocol.common.McpTransportContext;
-import io.modelcontextprotocol.server.McpServerFeatures.SyncPromptSpecification;
 import io.modelcontextprotocol.server.McpTransportContextExtractor;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -72,19 +62,15 @@ public class McpPlugin extends JavaPlugin {
     ServiceHandler toolHandler;
     
     @Override
+    public void onLoad() {
+        Configuration.PLUGIN = this;
+    }
+    
+    @Override
     public void onEnable() {        
         jsonMapper = new JacksonMcpJsonMapper(
                 JsonMapper.builder().build()
         );
-        
-        List<McpServerFeatures.SyncToolSpecification> foundTools = Lists.newArrayList();
-                                                      foundTools.addAll(ServiceHandler.findTools(this, new PlayerServices()));
-                                                      foundTools.addAll(ServiceHandler.findTools(this, new EntityServices()));
-                                                      foundTools.addAll(ServiceHandler.findTools(this, new PluginServices(this)));
-                                                      foundTools.addAll(ServiceHandler.findTools(this, new FileServices(this)));
-                                                      foundTools.addAll(ServiceHandler.findTools(this, new ServerServices(this)));
-                                                      foundTools.addAll(ServiceHandler.findTools(this, new WorldServices()));
-        List<McpServerFeatures.SyncPromptSpecification> foundPrompts = Lists.newArrayList();
         
         transportProvider = HttpServletStreamableServerTransportProvider.builder()
                 .jsonMapper(jsonMapper)
@@ -124,8 +110,8 @@ public class McpPlugin extends JavaPlugin {
                         .prompts(true)
 //                        .logging()
                         .build())
-                .tools(foundTools)
-                .prompts(foundPrompts)
+                .tools(ServiceHandler.getTools())
+//                .prompts(ServiceHandler.getPrompts())
                 .build();
         
         this.httpServer = new Server(Configuration.HTTP_PORT);

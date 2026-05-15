@@ -42,13 +42,13 @@ import org.bukkit.plugin.Plugin;
  */
 public class WrappedCommandSender implements CommandSender {
     
-    private final CommandSender consoleSender;
+    private final CommandSender commandSender;
     private final CommandSender.Spigot spigotWrapped;
     
     private StringBuilder consoleOutput;
     
     public WrappedCommandSender(CommandSender sender) {
-        this.consoleSender = sender;
+        this.commandSender = sender;
         this.consoleOutput = new StringBuilder();
         
         
@@ -76,7 +76,7 @@ public class WrappedCommandSender implements CommandSender {
 
             @Override
             public void sendMessage(BaseComponent component) {
-                consoleSender.spigot().sendMessage(component);
+                commandSender.spigot().sendMessage(component);
                 
                 String legacyText = TextComponent.toLegacyText(component);
                        legacyText = ChatColor.stripColor(legacyText);
@@ -111,7 +111,7 @@ public class WrappedCommandSender implements CommandSender {
     
     @Override
     public void sendMessage(String message) {
-        consoleSender.sendMessage(formattedConsoleMessage(message)); // We do thins so that the output is still shown to the CommandSender and then also forwards to the LLM
+        commandSender.sendMessage(formattedConsoleMessage(message)); // We do thins so that the output is still shown to the CommandSender and then also forwards to the LLM
         
         String cleaned = ChatColor.stripColor(message);
         
@@ -159,67 +159,67 @@ public class WrappedCommandSender implements CommandSender {
 
     @Override
     public boolean isPermissionSet(String name) {
-        return consoleSender.isPermissionSet(name);
+        return commandSender.isPermissionSet(name);
     }
 
     @Override
     public boolean isPermissionSet(Permission perm) {
-        return consoleSender.isPermissionSet(perm);
+        return commandSender.isPermissionSet(perm);
     }
 
     @Override
     public boolean hasPermission(String name) {
-        return consoleSender.hasPermission(name);
+        return commandSender.hasPermission(name);
     }
 
     @Override
     public boolean hasPermission(Permission perm) {
-        return consoleSender.hasPermission(perm);
+        return commandSender.hasPermission(perm);
     }
 
     @Override
     public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value) {
-        return consoleSender.addAttachment(plugin, name, value);
+        return commandSender.addAttachment(plugin, name, value);
     }
 
     @Override
     public PermissionAttachment addAttachment(Plugin plugin) {
-        return consoleSender.addAttachment(plugin);
+        return commandSender.addAttachment(plugin);
     }
 
     @Override
     public PermissionAttachment addAttachment(Plugin plugin, String name, boolean value, int ticks) {
-        return consoleSender.addAttachment(plugin, name, value, ticks);
+        return commandSender.addAttachment(plugin, name, value, ticks);
     }
 
     @Override
     public PermissionAttachment addAttachment(Plugin plugin, int ticks) {
-        return consoleSender.addAttachment(plugin, ticks);
+        return commandSender.addAttachment(plugin, ticks);
     }
 
     @Override
     public void removeAttachment(PermissionAttachment attachment) {
-        consoleSender.removeAttachment(attachment);
+        commandSender.removeAttachment(attachment);
     }
 
     @Override
     public void recalculatePermissions() {
-        consoleSender.recalculatePermissions();
+        commandSender.recalculatePermissions();
     }
 
     @Override
     public Set<PermissionAttachmentInfo> getEffectivePermissions() {
-        return consoleSender.getEffectivePermissions();
+        return commandSender.getEffectivePermissions();
     }
 
     @Override
     public boolean isOp() {
-        return consoleSender.isOp();
+        return commandSender.isOp();
     }
 
     @Override
     public void setOp(boolean value) {
-        consoleSender.setOp(value);
+        commandSender.setOp(value);
     }
     
 }

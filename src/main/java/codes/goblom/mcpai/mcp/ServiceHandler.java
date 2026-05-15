@@ -23,16 +23,20 @@
  */
 package codes.goblom.mcpai.mcp;
 
-import codes.goblom.mcpai.McpPlugin;
+import codes.goblom.mcpai.Configuration;
+import codes.goblom.mcpai.mcp.providers.PromptProvider;
+import codes.goblom.mcpai.mcp.providers.ToolProvider;
+import codes.goblom.mcpai.mcp.tools.entity.*;
+import codes.goblom.mcpai.mcp.tools.files.*;
+import codes.goblom.mcpai.mcp.tools.player.*;
+import codes.goblom.mcpai.mcp.tools.plugin.*;
+import codes.goblom.mcpai.mcp.tools.server.*;
+import codes.goblom.mcpai.mcp.tools.world.*;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.gson.Gson;
 import io.modelcontextprotocol.server.McpServerFeatures;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
-import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
 /**
@@ -41,113 +45,93 @@ import java.util.logging.Level;
  */
 public class ServiceHandler {
     
-    private ServiceHandler() { }
+    static final List<ToolProvider> TOOLS = new ArrayList() {
+        {
+            add(new GetPlayerInfo());
+            add(new GetLoggedInPlayers());
+            add(new GetPlayerLocation());
+            
+            add(new GetEntityTypes());
+            add(new SpawnEntityAtLocation());
+            
+            add(new EnablePlugin());
+            add(new DisablePlugin());
+            add(new ListPlugins());
+            add(new LoadPlugin());
+            add(new RestartPlugin());
+            
+            add(new ShutdownServer());
+            add(new ExecuteCommand());
+            
+            add(new CreateWorld());
+            
+            add(new ListDirectory());
+            add(new ReadFile());
+            add(new WriteFile());
+        }
+    };
     
-    protected static Object invokeMethod(McpPlugin plugin, McpServiceProvider serviceProvider, Method method, McpSyncServerExchange exchange, Object arguments) {
-        Object result;
-        try {
-            result =  method.invoke(serviceProvider, exchange, arguments);
-        } catch (Exception e) {
-            result = McpSchema.CallToolResult.builder()
-                    .isError(true)
-                    .addContent(new McpSchema.TextContent("Error: " + e.getMessage()))
-                    .build();
-            e.printStackTrace();
+    static final List<PromptProvider> PROMPTS = new ArrayList() {
+        {
+        
         }
+    };
+    
+    public static List<McpServerFeatures.SyncToolSpecification> getTools() {
+        List<McpServerFeatures.SyncToolSpecification> wrappedTools = Lists.newArrayList();
         
-        plugin.debug(Level.INFO, "\n\n" + new Gson().toJson(result) + "\n\n");
-        
-        return result;
-    }
-        
-    public static List<McpServerFeatures.SyncToolSpecification> findTools(McpPlugin plugin, McpServiceProvider toolObject) {
-        Class clazz = toolObject.getClass();
-        List<McpServerFeatures.SyncToolSpecification> tools = Lists.newArrayList();
-        
-        for (Method method : clazz.getDeclaredMethods()) {
-            if (method.isAnnotationPresent(McpServiceProvider.Tool.class)) {
-                McpServiceProvider.Tool tool = method.getAnnotation(McpServiceProvider.Tool.class);
-                plugin.debug(Level.WARNING, "Found Tool - {0} at {1}:{2}", tool.name(), clazz.getSimpleName(), method.getName());
-                
-                McpSchema.Tool.Builder toolBuilder = new McpSchema.Tool.Builder();
-                                       toolBuilder.description(tool.description());
-                                       
-                if (tool.name() != null && !tool.name().isEmpty()) {
-                    toolBuilder.name(tool.name());
-                } else {
-                    toolBuilder.name(method.getName()); // Using method name will sometimes result in your LLM not recognizing it as a tool the first try
-                }
-                
-                if (tool.inputSchema() != null && !tool.inputSchema().isEmpty()) {
-                    toolBuilder.inputSchema(plugin.jsonMapper, tool.inputSchema());
-                }
-                
-                if (tool.outputSchema() != null && !tool.outputSchema().isEmpty()) {
-                    toolBuilder.outputSchema(plugin.jsonMapper, tool.outputSchema());
-                }
-                
-                if (tool.meta().length > 0) {
-                    Map<String, Object> metaMap = Maps.newHashMap();
-                    
-                    for (McpServiceProvider.Attribute metaValue : tool.meta()) {
-                        metaMap.put(metaValue.key(), metaValue.value());
-                    }
-                    
-                    toolBuilder.meta(metaMap);
-                }
-                
-                if (tool.toolAnnotations().length == 6) {
-                    String title = null;
-                    boolean readOnlyHint = false;
-                    boolean destructiveHint = false;
-                    boolean idempotentHint = false;
-                    boolean openWorldHint = false;
-                    boolean returnDirect = false;
-                    
-                    boolean error = false;
-                    
-                    for (McpServiceProvider.Attribute attribute : tool.toolAnnotations()) {
-                        switch (attribute.key()) {
-                            case "title":
-                                title = attribute.value();
-                                continue;
-                            case "readOnlyHint":
-                                readOnlyHint = Boolean.getBoolean(attribute.value());
-                                continue;
-                            case "destructiveHint":
-                                 destructiveHint = Boolean.getBoolean(attribute.value());
-                                continue;
-                            case "idempotentHint":
-                                 idempotentHint = Boolean.getBoolean(attribute.value());
-                                continue;
-                            case "openWorldHint":
-                                 openWorldHint = Boolean.getBoolean(attribute.value());
-                                continue;
-                            case "returnDirect":
-                                 returnDirect = Boolean.getBoolean(attribute.value());
-                                continue;
-                            default:
-                                error = true;
-                                plugin.debug(Level.WARNING, "Improper ToolAnnotation found on {0} with key of {1}", tool.name(), attribute.key());
-                        }
-                    }
-                    
-                    if (!error) {
-                        toolBuilder.annotations(new McpSchema.ToolAnnotations(title, readOnlyHint, destructiveHint, idempotentHint, openWorldHint, returnDirect));
-                    }
-                } else if (tool.toolAnnotations().length != 0) {
-                    plugin.debug(Level.WARNING, "Tool {0} is not properly setup for ToolAnnotations.", tool.name());
-                }
-                
-                McpServerFeatures.SyncToolSpecification syncToolWrapper = new McpServerFeatures.SyncToolSpecification(
-                        toolBuilder.build(),
-                        new WrappedSyncToolSpecification(plugin, toolObject, tool, method)
-                );
-                
-                tools.add(syncToolWrapper);
+        TOOLS.forEach((tool) -> {
+            McpSchema.Tool.Builder builder = McpSchema.Tool.builder();
+            
+            if (tool.getName() != null && !tool.getName().isEmpty()) {
+                builder.name(tool.getName());
+            } else {
+                // Using class name with sometimes result in your LLM not recognizing it as a tool the first try
+                builder.name(tool.getClass().getSimpleName());
             }
-        }
+            
+            if (tool.getInputSchema() != null && !tool.getInputSchema().isEmpty()) {
+                builder.inputSchema(Configuration.PLUGIN.jsonMapper, tool.getInputSchema());
+            }
+            
+            if (tool.getOutputSchema() != null && !tool.getOutputSchema().isEmpty()) {
+                builder.outputSchema(Configuration.PLUGIN.jsonMapper, tool.getOutputSchema());
+            }
+            
+            if (tool.getMeta() != null && !tool.getMeta().isEmpty()) {
+                builder.meta(tool.getMeta());
+            }
+            
+            if (tool.getClass().isAnnotationPresent(ToolProvider.ToolAnnotation.class)) {
+                ToolProvider.ToolAnnotation toolAnnotation = tool.getClass().getAnnotation(ToolProvider.ToolAnnotation.class);
+                
+                builder.annotations(new McpSchema.ToolAnnotations(
+                        toolAnnotation.title(), 
+                        toolAnnotation.readOnlyHint(), 
+                        toolAnnotation.destructiveHint(), 
+                        toolAnnotation.idempotentHint(), 
+                        toolAnnotation.openWorldHint(), 
+                        toolAnnotation.returnDirect()));
+            }
+            
+            McpServerFeatures.SyncToolSpecification wrappedTool = new McpServerFeatures.SyncToolSpecification(
+                    builder.build(),
+                    tool
+            );
+            
+            wrappedTools.add(wrappedTool);
+            
+            Configuration.PLUGIN.debug(Level.INFO, "Registered Tool {0}:{1}", tool.getClass().getSimpleName(), tool.getName());
+        });
         
-        return tools;
+        return wrappedTools;
+    }
+    
+    /**
+     * @deprecated Not Implemented
+     */
+    @Deprecated
+    public static List<McpServerFeatures.SyncPromptSpecification> getPrompts() {
+        return null;
     }
 }

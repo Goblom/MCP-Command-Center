@@ -21,12 +21,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package codes.goblom.mcpai.mcp.services;
+package codes.goblom.mcpai.mcp.tools.world;
 
-import codes.goblom.mcpai.mcp.McpServiceProvider;
+import codes.goblom.mcpai.mcp.providers.ToolProvider;
+import codes.goblom.mcpai.mcp.tools.SharedToolData;
+import codes.goblom.mcpai.mcp.InputSchemaBuilder;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
-import io.modelcontextprotocol.spec.McpSchema.CallToolRequest;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
@@ -36,46 +37,32 @@ import org.bukkit.WorldType;
  *
  * @author Bryan
  */
-public class WorldServices implements McpServiceProvider {
-    
-//    {
-//        InputSchemaBuilder.newBuilder()
-//                .addRequiredProperty("name", InputSchemaBuilder.ParameterType.String)
-//                .addOptionalProperty("seed", InputSchemaBuilder.ParameterType.Number)
-//                .addOptionalProperty("worldEnvironment", InputSchemaBuilder.ParameterType.String)
-//                .addOptionalProperty("worldType", InputSchemaBuilder.ParameterType.String)
-//                .addOptionalProperty("generateStructures", InputSchemaBuilder.ParameterType.Boolean)
-//                .addOptionalProperty("generatorSettings", InputSchemaBuilder.ParameterType.String)
-//                .addOptionalProperty("hardcore", InputSchemaBuilder.ParameterType.Boolean)
-//                .additionalProperties(true)
-//                .toJson();
-//                
-//    }
-    
-    @Tool(
-            name = "create_world",
-            description = "Create a world wiith the given values",
-            inputSchema =  // Needs Descriptions and chunkGenerator, biomeProvider
-                    """
-                    {
-                        "type": "object",
-                        "properties": {
-                            "name": { "type": "string" },
-                            "seed": { "type": "string" },
-                            "worldEnvironment": { "type": "string" },
-                            "worldType": { "type": "string" },
-                            "generateStructures": { "type": "boolean" },
-                            "generatorSettings": { "type": "string" },
-                            "hardcore": { "type": "boolean" }
-                        },
-                        "required": ["name"],
-                        "additionalProperties": "true"
-                    }
-                    """,
-            requiresSyncMethod = true,
-            syncMethodTimeout = 20 * 5 //5 Seconds
-    ) 
-    public McpSchema.CallToolResult createWorld(McpSyncServerExchange exchange, CallToolRequest request) {
+public class CreateWorld extends ToolProvider {
+        
+    static final String INPUT_SCHEMA = InputSchemaBuilder.builder()
+            .addRequiredProperty("name", InputSchemaBuilder.ParameterType.String)
+            .addOptionalProperty("seed", InputSchemaBuilder.ParameterType.Number)
+            .addOptionalProperty("worldEnvironment", InputSchemaBuilder.ParameterType.String)
+            .addOptionalProperty("worldType", InputSchemaBuilder.ParameterType.String)
+            .addOptionalProperty("generateStructures", InputSchemaBuilder.ParameterType.Boolean)
+            .addOptionalProperty("generatorSettings", InputSchemaBuilder.ParameterType.String)
+            .addOptionalProperty("hardcore", InputSchemaBuilder.ParameterType.Boolean)
+            
+            // chunkGenerator
+            // biomeProvider
+            .toJson();
+                
+    public CreateWorld() {
+        super(
+                "create_world",
+                "Create a world with the given values",
+                INPUT_SCHEMA
+        );
+    }
+
+    @Override
+    @RequireSyncMethod( timeout = 20 * 5 )
+    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
         String name = (String) request.arguments().get("name");
         long seed = (long) request.arguments().getOrDefault("seed", Long.MIN_VALUE); //MIN_VALUE to tell if no seed was present
         String worldEnvironmentStr = (String) request.arguments().get("worldEnvironment");
@@ -108,15 +95,15 @@ public class WorldServices implements McpServiceProvider {
         }
         
         if (generatorSettings != null && !generatorSettings.isEmpty()) {
-            creator.generator(generatorSettings, ServerServices.COMMAND_SENDER);
+            creator.generator(generatorSettings, SharedToolData.COMMAND_SENDER);
         }
         
         creator.generateStructures(generateStructures);
         creator.hardcore(hardcore);
         
         World createdWorld = creator.createWorld();
-        String output = ServerServices.COMMAND_SENDER.getConsoleOutput();
-        ServerServices.COMMAND_SENDER.clearConsoleOutput();
+        String output = SharedToolData.COMMAND_SENDER.getConsoleOutput();
+        SharedToolData.COMMAND_SENDER.clearConsoleOutput();
         
         
         return McpSchema.CallToolResult.builder()
