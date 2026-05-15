@@ -39,11 +39,6 @@ import java.io.IOException;
  */
 public class TokenAuthFilter implements Filter {
 
-    private final McpPlugin plugin;
-    
-    public TokenAuthFilter(McpPlugin plugin) {
-        this.plugin = plugin;
-    }
     @Override
     public void doFilter(ServletRequest sRequest, ServletResponse sResponse, FilterChain chain) throws IOException, ServletException {
         HttpServletRequest request = (HttpServletRequest) sRequest;

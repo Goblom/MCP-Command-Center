@@ -119,7 +119,7 @@ public class McpPlugin extends JavaPlugin {
         
         this.contextHandler.setContextPath("/");
         this.contextHandler.addServlet(new ServletHolder(transportProvider), Configuration.MCP_PATH);
-        this.contextHandler.addFilter(new FilterHolder(new TokenAuthFilter(this)), Configuration.MCP_PATH, EnumSet.of(DispatcherType.REQUEST));
+        this.contextHandler.addFilter(new FilterHolder(new TokenAuthFilter()), Configuration.MCP_PATH, EnumSet.of(DispatcherType.REQUEST));
         
         this.httpServer.setHandler(contextHandler);
         
