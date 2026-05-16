@@ -42,7 +42,6 @@ public interface ServiceProvider<RES extends McpSchema.Result, REQ extends McpSc
     @Target(ElementType.METHOD)
     @Retention(RetentionPolicy.RUNTIME)
     public @interface RequireSyncMethod {
-//        boolean requiresSyncMethod() default true;
         long timeout() default -1;
     }
     
@@ -52,18 +51,7 @@ public interface ServiceProvider<RES extends McpSchema.Result, REQ extends McpSc
     
     public default String getInputSchema() {
         return DEFAULT_SCHEMA;
-//        return """
-//                    {
-//                      "type": "object",
-//                      "properties": { },
-////                    "additionalProperties": false
-//                    }
-//                """;
     }
-    
-    // Helper functions to call sync methods without having to use a scheduler in the method itself
-//    public default boolean requiresSyncMethod() { return false; }
-//    public default long getSyncMethodTimeout() { return -1; }
 
     @Override
     public RES apply(McpSyncServerExchange exchange, REQ request);
