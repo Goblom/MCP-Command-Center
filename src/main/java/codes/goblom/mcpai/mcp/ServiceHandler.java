@@ -51,6 +51,7 @@ public class ServiceHandler {
             add(new GetPlayerInfo());
             add(new GetLoggedInPlayers());
             add(new GetPlayerLocation());
+            add(new TeleportPlayer());
             
             add(new GetEntityTypes());
             add(new SpawnEntityAtLocation());
