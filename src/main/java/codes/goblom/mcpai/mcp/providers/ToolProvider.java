@@ -136,7 +136,7 @@ public abstract class ToolProvider implements ServiceProvider<McpSchema.CallTool
         
         try {
             McpToolContext toolContext = new McpToolContext(exchange, request);
-            Method execute = getClass().getMethod("execute", McpSyncServerExchange.class, McpSchema.CallToolRequest.class);
+            Method execute = getClass().getDeclaredMethod("execute", McpToolContext.class);
             
             if (execute != null && execute.isAnnotationPresent(RequireSyncMethod.class)) {
                 RequireSyncMethod syncMethod = execute.getAnnotation(RequireSyncMethod.class);
