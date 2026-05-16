@@ -50,7 +50,7 @@ import java.util.Map;
  *
  * @author Bryan
  */
-public class McpPlugin extends JavaPlugin {
+public class CommandCenterPlugin extends JavaPlugin {
     
     public JacksonMcpJsonMapper jsonMapper;
     HttpServletStreamableServerTransportProvider transportProvider;
