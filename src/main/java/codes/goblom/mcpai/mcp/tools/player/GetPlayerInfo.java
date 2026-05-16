@@ -25,9 +25,9 @@ package codes.goblom.mcpai.mcp.tools.player;
 
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.Arrays;
 import java.util.List;
@@ -60,9 +60,9 @@ public class GetPlayerInfo extends ToolProvider {
     }
     
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String playerName = (String) request.arguments().get("player");
-        boolean uuid = (boolean) request.arguments().getOrDefault("uuid", false);
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String playerName = context.getArgument("player");
+        boolean uuid = context.getArgument("uuid", false);
         
         Player player;
         

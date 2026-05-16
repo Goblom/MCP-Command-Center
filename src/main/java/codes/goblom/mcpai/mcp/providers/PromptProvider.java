@@ -24,7 +24,9 @@
 package codes.goblom.mcpai.mcp.providers;
 
 import codes.goblom.mcpai.mcp.ServiceProvider;
+import codes.goblom.mcpai.mcp.context.McpPromptContext;
 import com.google.common.collect.Lists;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.List;
 
@@ -40,6 +42,25 @@ public abstract class PromptProvider implements ServiceProvider<McpSchema.GetPro
     public final boolean hasPermission(String token) {
         return true;
     }
+
+    @Override
+    public final McpSchema.GetPromptResult apply(McpSyncServerExchange exchange, McpSchema.GetPromptRequest request) {
+        String token = ((String[]) exchange.transportContext().get("token"))[0];
+        
+        if (!hasPermission(token)) {
+            return new McpSchema.GetPromptResult(
+                    "no_permission", 
+                    PromptMessageBuilder.builder()
+                            .textContent(McpSchema.Role.USER, "Error: No Permissions")
+                            .build()
+            );
+        }
+        
+        McpPromptContext context = new McpPromptContext(exchange, request);
+        return execute(context);
+    }
+    
+    public abstract McpSchema.GetPromptResult execute(McpPromptContext context);
     
     //TODO: Add support for other messages like...
     //      ImageContent, AudioContent, EmbeddedResource, ResourceLink

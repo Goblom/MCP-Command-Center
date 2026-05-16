@@ -31,7 +31,6 @@ import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
 
 /**
  *

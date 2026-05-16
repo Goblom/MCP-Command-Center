@@ -25,10 +25,8 @@ package codes.goblom.mcpai.mcp.tools.plugin;
 
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
-import com.google.common.collect.Lists;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import io.modelcontextprotocol.spec.McpSchema;
-import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 
@@ -62,12 +60,12 @@ public class ListPlugins extends ToolProvider {
     }
 
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
         Plugin[] plugins = Bukkit.getPluginManager().getPlugins();
         
-        boolean version = (boolean) request.arguments().get("version");
-        boolean file = (boolean) request.arguments().get("file");
-        boolean status = (boolean) request.arguments().get("status");
+        boolean version = context.getArgument("version");
+        boolean file = context.getArgument("file");
+        boolean status = context.getArgument("status");
         
 //        List<String> dataSet = Lists.newArrayList();
 //        

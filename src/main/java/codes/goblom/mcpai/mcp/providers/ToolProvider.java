@@ -25,6 +25,7 @@ package codes.goblom.mcpai.mcp.providers;
 
 import codes.goblom.mcpai.Configuration;
 import codes.goblom.mcpai.mcp.ServiceProvider;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import com.google.gson.Gson;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
@@ -134,6 +135,7 @@ public abstract class ToolProvider implements ServiceProvider<McpSchema.CallTool
         }
         
         try {
+            McpToolContext toolContext = new McpToolContext(exchange, request);
             Method execute = getClass().getMethod("execute", McpSyncServerExchange.class, McpSchema.CallToolRequest.class);
             
             if (execute != null && execute.isAnnotationPresent(RequireSyncMethod.class)) {
@@ -141,7 +143,7 @@ public abstract class ToolProvider implements ServiceProvider<McpSchema.CallTool
 
                 if (syncMethod != null) {
                     long timeout = syncMethod.timeout();
-                    Future<McpSchema.CallToolResult> future = Bukkit.getScheduler().callSyncMethod(Configuration.PLUGIN, () -> execute(exchange, request));
+                    Future<McpSchema.CallToolResult> future = Bukkit.getScheduler().callSyncMethod(Configuration.PLUGIN, () -> execute(toolContext));
                     
                     if (timeout <= 0) {
                         return future.get();
@@ -151,7 +153,7 @@ public abstract class ToolProvider implements ServiceProvider<McpSchema.CallTool
                 }
             }
             
-            return execute(exchange, request);
+            return execute(toolContext);
         } catch (Exception e) {
             e.printStackTrace();
             return McpSchema.CallToolResult.builder()
@@ -162,5 +164,5 @@ public abstract class ToolProvider implements ServiceProvider<McpSchema.CallTool
     }
     
     
-    public abstract McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception;
+    public abstract McpSchema.CallToolResult execute(McpToolContext context) throws Exception;
 }

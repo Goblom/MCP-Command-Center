@@ -24,8 +24,8 @@
 package codes.goblom.mcpai.mcp.tools.world;
 
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
@@ -62,15 +62,15 @@ public class FillArea extends ToolProvider {
 
     @Override
     @RequireSyncMethod
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String worldName = (String) request.arguments().get("loc-world");
-        int startX = (int) request.arguments().get("start-x");
-        int startY = (int) request.arguments().get("start-y");
-        int startZ = (int) request.arguments().get("start-z");
-        int endX = (int) request.arguments().get("end-x");
-        int endY = (int) request.arguments().get("end-y");
-        int endZ = (int) request.arguments().get("end-z");
-        String blockType = (String) request.arguments().get("blockType");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String worldName = context.getArgument("loc-world");
+        int startX = context.getArgument("start-x");
+        int startY = context.getArgument("start-y");
+        int startZ = context.getArgument("start-z");
+        int endX = context.getArgument("end-x");
+        int endY = context.getArgument("end-y");
+        int endZ = context.getArgument("end-z");
+        String blockType = context.getArgument("blockType");
         
         Material mat = Material.getMaterial(blockType);
         World world = Bukkit.getWorld(worldName);

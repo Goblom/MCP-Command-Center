@@ -25,7 +25,7 @@ package codes.goblom.mcpai.mcp.tools.player;
 
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
@@ -51,8 +51,8 @@ public class GetLoggedInPlayers extends ToolProvider {
     }
     
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        boolean uuid = (boolean) request.arguments().get("uuid");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        boolean uuid = context.getArgument("uuid");
         
         return McpSchema.CallToolResult.builder().content(
                 Bukkit.getOnlinePlayers().stream().map((Player p) -> (McpSchema.Content) new McpSchema.TextContent(uuid ? p.getUniqueId().toString() : p.getName())).toList()

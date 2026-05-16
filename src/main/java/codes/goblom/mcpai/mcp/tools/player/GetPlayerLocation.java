@@ -25,7 +25,7 @@ package codes.goblom.mcpai.mcp.tools.player;
 
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -54,9 +54,9 @@ public class GetPlayerLocation extends ToolProvider {
     }
 
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String playerStr = (String) request.arguments().get("player");
-        boolean isUUID = (boolean) request.arguments().getOrDefault("isUUID", false);
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String playerStr = context.getArgument("player");
+        boolean isUUID = context.getArgument("isUUID", false);
         
         Player player;
         

@@ -25,8 +25,8 @@ package codes.goblom.mcpai.mcp.tools.plugin;
 
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import codes.goblom.mcpai.mcp.tools.SharedToolData;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.io.File;
 import org.bukkit.Bukkit;
@@ -52,8 +52,8 @@ public class LoadPlugin extends ToolProvider {
     }
 
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String fileName = (String) request.arguments().get("fileName");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String fileName = context.getArgument("fileName");
         
         if (fileName == null || fileName.isEmpty()) {
             return McpSchema.CallToolResult.builder().isError(true).addTextContent("Error: fileName parameter is empty").build();

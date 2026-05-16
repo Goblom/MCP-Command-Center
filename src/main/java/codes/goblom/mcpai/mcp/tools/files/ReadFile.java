@@ -23,11 +23,10 @@
  */
 package codes.goblom.mcpai.mcp.tools.files;
 
-import codes.goblom.mcpai.Configuration;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import codes.goblom.mcpai.mcp.tools.SharedToolData;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -52,8 +51,8 @@ public class ReadFile extends ToolProvider {
     }
 
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String pathStr = (String) request.arguments().get("path");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String pathStr = context.getArgument("path");
         Path path = SharedToolData.SERVER_DIR.resolve(pathStr).normalize();
         
         if (!path.startsWith(SharedToolData.SERVER_DIR)) {

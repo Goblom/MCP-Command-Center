@@ -25,9 +25,9 @@ package codes.goblom.mcpai.mcp.tools.server;
 
 import codes.goblom.mcpai.Configuration;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.tools.SharedToolData;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -72,8 +72,8 @@ public class GetLog extends ToolProvider {
     }
 
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String logFile = (String) request.arguments().getOrDefault("timestamp", LATEST);
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String logFile = context.getArgument("timestamp", LATEST);
         
         if (logFile.equalsIgnoreCase(LATEST) || logFile.equalsIgnoreCase("latest")) {
             Path path = SharedToolData.SERVER_DIR.resolve("logs/" + LATEST);

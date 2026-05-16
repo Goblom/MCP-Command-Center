@@ -21,38 +21,41 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package codes.goblom.mcpai.mcp.tools.world;
+package codes.goblom.mcpai.mcp;
 
-import codes.goblom.mcpai.mcp.InputSchemaBuilder;
-import codes.goblom.mcpai.mcp.context.McpToolContext;
-import codes.goblom.mcpai.mcp.providers.ToolProvider;
-import codes.goblom.mcpai.mcp.tools.SharedToolData;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
+import io.modelcontextprotocol.spec.McpSchema.ProgressNotification;
 
 /**
  *
  * @author Bryan
  */
-public class GetBlockTypes extends ToolProvider {
+public class McpContext<R extends McpSchema.Request> {
     
-    static final String INPUT_SCHEMA = InputSchemaBuilder.builder()
-//            .id("urn:jsonschema:Operation")
-            .toJson();
+    private final McpSyncServerExchange exchange;
+    private final R request;
     
-    public GetBlockTypes() {
-        super(
-                "get_block_types",
-                "Get a list of all available BlockTypes on the server.",
-                INPUT_SCHEMA
-        );
+    protected McpContext(McpSyncServerExchange exchange, R request) {
+        this.exchange = exchange;
+        this.request = request;
     }
-
-    @Override
-    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
-        McpSchema.CallToolResult.Builder builder = McpSchema.CallToolResult.builder();
+    
+    public McpSyncServerExchange exchange() {
+        return this.exchange;
+    }
+    
+    public R request() {
+        return this.request;
+    }
+    
+    public void notification(ProgressNotification notif) {
+        exchange().progressNotification(notif);
+    }
+    
+    public void notification(Object progressToken, double progress, double total, String message) {
+        ProgressNotification notif = new ProgressNotification(progressToken, progress, total, message);
         
-        SharedToolData.AVAILABLE_BLOCKS.forEach((mat) -> builder.addTextContent(mat.name().toLowerCase()));
-        
-        return builder.build();
+        notification(notif);
     }
 }

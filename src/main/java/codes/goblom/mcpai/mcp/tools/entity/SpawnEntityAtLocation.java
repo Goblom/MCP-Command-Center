@@ -26,10 +26,8 @@ package codes.goblom.mcpai.mcp.tools.entity;
 import codes.goblom.mcpai.Configuration;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import io.modelcontextprotocol.spec.McpSchema;
-import java.util.ArrayList;
-import java.util.List;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
@@ -67,13 +65,13 @@ public class SpawnEntityAtLocation extends ToolProvider {
     
     @Override
     @RequireSyncMethod
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String worldName = (String) request.arguments().get("loc-world");
-        double x = Double.parseDouble(request.arguments().get("loc-x").toString());
-        double y = Double.parseDouble(request.arguments().get("loc-y").toString());
-        double z = Double.parseDouble(request.arguments().get("loc-z").toString());
-        EntityType entityType = EntityType.fromName((String) request.arguments().get("entityType"));
-        boolean randomizeData = (boolean) request.arguments().getOrDefault("randomizeData", Configuration.RANDOM.nextBoolean());
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String worldName = context.getArgument("loc-world");
+        double x = Double.parseDouble(context.getArgument("loc-x").toString());
+        double y = Double.parseDouble(context.getArgument("loc-y").toString());
+        double z = Double.parseDouble(context.getArgument("loc-z").toString());
+        EntityType entityType = EntityType.fromName(context.getArgument("entityType"));
+        boolean randomizeData = context.getArgument("randomizeData", Configuration.RANDOM.nextBoolean());
         
         if (entityType == null) {
             return McpSchema.CallToolResult.builder()

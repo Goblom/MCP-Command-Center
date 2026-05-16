@@ -25,9 +25,9 @@ package codes.goblom.mcpai.mcp.tools.env;
 
 import codes.goblom.mcpai.Configuration;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.tools.SharedToolData;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.List;
 import java.util.logging.Level;
@@ -131,8 +131,8 @@ public class ExecuteLua extends ToolProvider {
 
     @Override
     @RequireSyncMethod
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String luaCode = (String) request.arguments().get("code");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String luaCode = context.getArgument("code");
         
         LuaValue compiled = _globals.load(luaCode);
         

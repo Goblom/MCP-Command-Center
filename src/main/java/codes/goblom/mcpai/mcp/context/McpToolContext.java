@@ -21,38 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package codes.goblom.mcpai.mcp.tools.world;
+package codes.goblom.mcpai.mcp.context;
 
-import codes.goblom.mcpai.mcp.InputSchemaBuilder;
-import codes.goblom.mcpai.mcp.context.McpToolContext;
-import codes.goblom.mcpai.mcp.providers.ToolProvider;
-import codes.goblom.mcpai.mcp.tools.SharedToolData;
+import codes.goblom.mcpai.mcp.McpContext;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 
 /**
  *
  * @author Bryan
  */
-public class GetBlockTypes extends ToolProvider {
+public class McpToolContext extends McpContext<McpSchema.CallToolRequest> {
     
-    static final String INPUT_SCHEMA = InputSchemaBuilder.builder()
-//            .id("urn:jsonschema:Operation")
-            .toJson();
-    
-    public GetBlockTypes() {
-        super(
-                "get_block_types",
-                "Get a list of all available BlockTypes on the server.",
-                INPUT_SCHEMA
-        );
+    public McpToolContext(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) {
+        super(exchange, request);
     }
-
-    @Override
-    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
-        McpSchema.CallToolResult.Builder builder = McpSchema.CallToolResult.builder();
-        
-        SharedToolData.AVAILABLE_BLOCKS.forEach((mat) -> builder.addTextContent(mat.name().toLowerCase()));
-        
-        return builder.build();
+    
+    public <T> T getArgument(String name) {
+        return (T) request().arguments().get(name);
+    }
+    
+    public <T> T getArgument(String name, T def) {
+        return (T) request().arguments().getOrDefault(name, def);
     }
 }

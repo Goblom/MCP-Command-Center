@@ -24,8 +24,8 @@
 package codes.goblom.mcpai.mcp.tools.server;
 
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.bukkit.Bukkit;
 
@@ -46,7 +46,7 @@ public class GetServerVersion extends ToolProvider {
     }
 
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
         return McpSchema.CallToolResult.builder().addTextContent(Bukkit.getVersion()).build();
     }
     

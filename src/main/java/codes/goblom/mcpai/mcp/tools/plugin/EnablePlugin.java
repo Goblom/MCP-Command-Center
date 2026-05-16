@@ -25,7 +25,7 @@ package codes.goblom.mcpai.mcp.tools.plugin;
 
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
@@ -50,8 +50,8 @@ public class EnablePlugin extends ToolProvider {
     }
 
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String pluginName = (String) request.arguments().get("pluginName");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String pluginName = context.getArgument("pluginName");
         
         if (pluginName == null || pluginName.isEmpty()) {
             return McpSchema.CallToolResult.builder().isError(true).addTextContent("Error: pluginName parameter is empty").build();

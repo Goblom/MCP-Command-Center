@@ -24,8 +24,8 @@
 package codes.goblom.mcpai.mcp.tools.player;
 
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.UUID;
 import org.bukkit.Bukkit;
@@ -62,13 +62,13 @@ public class TeleportPlayer extends ToolProvider {
 
     @Override
     @RequireSyncMethod
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String name = (String) request.arguments().get("player");
-        boolean uuid = (boolean) request.arguments().getOrDefault("uuid", false);
-        String worldName = (String) request.arguments().get("loc-world");
-        int x = (int) request.arguments().get("loc-x");
-        int y = (int) request.arguments().get("loc-y");
-        int z = (int) request.arguments().get("loc-z");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String name = context.getArgument("player");
+        boolean uuid = context.getArgument("uuid", false);
+        String worldName = context.getArgument("loc-world");
+        int x = context.getArgument("loc-x");
+        int y = context.getArgument("loc-y");
+        int z = context.getArgument("loc-z");
         
         Player player;
         

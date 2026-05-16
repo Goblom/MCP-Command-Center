@@ -25,7 +25,7 @@ package codes.goblom.mcpai.mcp.tools.entity;
 
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +58,7 @@ public class GetEntityTypes extends ToolProvider {
     }
     
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
         McpSchema.CallToolResult.Builder builder = McpSchema.CallToolResult.builder();
         
         for (EntityType type : EntityType.values()) {

@@ -26,7 +26,7 @@ package codes.goblom.mcpai.mcp.tools.world;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.tools.SharedToolData;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -62,16 +62,16 @@ public class CreateWorld extends ToolProvider {
 
     @Override
     @RequireSyncMethod( timeout = 20 * 5 )
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String name = (String) request.arguments().get("name");
-        long seed = (long) request.arguments().getOrDefault("seed", Long.MIN_VALUE); //MIN_VALUE to tell if no seed was present
-        String worldEnvironmentStr = (String) request.arguments().get("worldEnvironment");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String name = context.getArgument("name");
+        long seed = context.getArgument("seed", Long.MIN_VALUE); //MIN_VALUE to tell if no seed was present
+        String worldEnvironmentStr = context.getArgument("worldEnvironment");
         // Chunk Generator
         // Biome Provider
-        String worldTypeStr = (String) request.arguments().get("worldType");
-        boolean generateStructures = (boolean) request.arguments().getOrDefault("generateStructures", true); //Follows the WorldCreator constructor
-        String generatorSettings = (String) request.arguments().get("generatorSettings");
-        boolean hardcore = (boolean) request.arguments().getOrDefault("hardcore", false); //Follows WorldCreator constructor
+        String worldTypeStr = context.getArgument("worldType");
+        boolean generateStructures = context.getArgument("generateStructures", true); //Follows the WorldCreator constructor
+        String generatorSettings = context.getArgument("generatorSettings");
+        boolean hardcore = context.getArgument("hardcore", false); //Follows WorldCreator constructor
         
         if (Bukkit.getWorld(name) != null) {
             return McpSchema.CallToolResult.builder()

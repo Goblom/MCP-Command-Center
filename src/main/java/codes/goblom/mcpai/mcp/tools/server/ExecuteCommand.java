@@ -26,7 +26,7 @@ package codes.goblom.mcpai.mcp.tools.server;
 import codes.goblom.mcpai.mcp.tools.SharedToolData;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.lang.reflect.Field;
 import org.bukkit.Bukkit;
@@ -51,8 +51,8 @@ public class ExecuteCommand extends ToolProvider {
     }
 
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-    String command = (String) request.arguments().get("command");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+    String command = context.getArgument("command");
         
         if (command == null || command.isEmpty()) {
             return McpSchema.CallToolResult.builder()

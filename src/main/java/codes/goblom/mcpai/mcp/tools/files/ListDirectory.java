@@ -26,8 +26,8 @@ package codes.goblom.mcpai.mcp.tools.files;
 import codes.goblom.mcpai.Configuration;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import codes.goblom.mcpai.mcp.tools.SharedToolData;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -106,8 +106,8 @@ public class ListDirectory extends ToolProvider {
 
     
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String searchPathStr = (String) request.arguments().getOrDefault("path", ".");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String searchPathStr = context.getArgument("path", ".");
         Path searchPath
                 = searchPathStr.equalsIgnoreCase("root")
                 || searchPathStr.equalsIgnoreCase("server")

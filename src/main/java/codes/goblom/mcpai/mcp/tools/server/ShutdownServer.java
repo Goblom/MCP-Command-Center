@@ -26,7 +26,7 @@ package codes.goblom.mcpai.mcp.tools.server;
 import codes.goblom.mcpai.Configuration;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.bukkit.Bukkit;
 
@@ -56,9 +56,9 @@ public class ShutdownServer extends ToolProvider {
     }
     
     @Override
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        boolean confirmed = (boolean) request.arguments().get("confirmed");
-        int delay = (int) request.arguments().get("delay");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        boolean confirmed = context.getArgument("confirmed");
+        int delay = context.getArgument("delay");
         
         if (!confirmed) {
             return McpSchema.CallToolResult.builder()

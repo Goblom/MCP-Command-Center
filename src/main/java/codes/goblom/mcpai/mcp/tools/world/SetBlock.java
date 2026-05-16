@@ -24,8 +24,8 @@
 package codes.goblom.mcpai.mcp.tools.world;
 
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.context.McpToolContext;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
-import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -64,12 +64,12 @@ public class SetBlock extends ToolProvider {
 
     @Override
     @RequireSyncMethod
-    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
-        String worldName = (String) request.arguments().get("loc-world");
-        int x = (int) request.arguments().get("loc-x");
-        int y = (int) request.arguments().get("loc-y");
-        int z = (int) request.arguments().get("loc-z");
-        String blockType = (String) request.arguments().get("blockType");
+    public McpSchema.CallToolResult execute(McpToolContext context) throws Exception {
+        String worldName = context.getArgument("loc-world");
+        int x = context.getArgument("loc-x");
+        int y = context.getArgument("loc-y");
+        int z = context.getArgument("loc-z");
+        String blockType = context.getArgument("blockType");
         Material mat = Material.getMaterial(blockType);
         
         if (mat == null) {
