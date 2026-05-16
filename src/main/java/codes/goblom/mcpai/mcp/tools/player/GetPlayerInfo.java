@@ -25,11 +25,19 @@ package codes.goblom.mcpai.mcp.tools.player;
 
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import com.google.common.collect.Lists;
+import com.google.gson.Gson;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 /**
  *
@@ -50,10 +58,11 @@ public class GetPlayerInfo extends ToolProvider {
                 INPUT_SCHEMA
         );
     }
+    
     @Override
     public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
         String playerName = (String) request.arguments().get("player");
-        boolean uuid = (boolean) request.arguments().get("uuid");
+        boolean uuid = (boolean) request.arguments().getOrDefault("uuid", false);
         
         Player player;
         
@@ -86,14 +95,59 @@ public class GetPlayerInfo extends ToolProvider {
         builder.addTextContent("Walk Speed: " + player.getWalkSpeed());
         builder.addTextContent("Fly Speed: " + player.getFlySpeed());
         
-        // These return Object value instead of readable values
-        builder.addTextContent("Item in Hand: " + player.getInventory().getItemInMainHand());
-        builder.addTextContent("Item in OffHand: " + player.getInventory().getItemInOffHand());
-        builder.addTextContent("Armor: " + player.getInventory().getArmorContents());
-        builder.addTextContent("Inventory: " + player.getInventory());
+        // These require some sort of serialization for the LLM to read
+        Gson gson = new Gson();
         
+        String mainHand = null;
+        String offHand = null;
+        String armor = null;
+        String inventory = gson.toJson(serialize(player.getInventory()));
+        
+        if (player.getInventory().getItemInMainHand() != null) {
+            mainHand = gson.toJson(player.getInventory().getItemInMainHand().serialize());
+        }
+        
+        if (player.getInventory().getItemInOffHand() != null) {
+            offHand = gson.toJson(player.getInventory().getItemInOffHand().serialize());
+        } 
+        
+        if (player.getInventory().getArmorContents() != null) {
+            List<ItemStack> armorStack = Arrays.asList(player.getInventory().getArmorContents());
+            
+            armor = gson.toJson(armorStack);
+        }
+        
+        if (mainHand != null) {
+            builder.addTextContent("Item in Hand: " + mainHand);
+        }
+        
+        if (offHand != null) {
+            builder.addTextContent("Item in OffHand: " + offHand);
+        }
+        
+        if (armor != null) {
+            builder.addTextContent("Armor: " + armor);
+        }
+        
+        builder.addTextContent("Inventory: " + inventory);
+        
+        gson.toJsonTree(serialize(player.getInventory()));
         
         return builder.build();
     }
     
+    private List<Map<String, Object>> serialize(Inventory inv) {
+        List<Map<String, Object>> map = Lists.newArrayList();
+        
+        for (ItemStack item : inv.getContents()) {
+            if (item == null) {
+                map.add(new ItemStack(Material.AIR).serialize());
+                continue;
+            }
+            
+            map.add(item.serialize());
+        }
+        
+        return map;
+    }
 }
