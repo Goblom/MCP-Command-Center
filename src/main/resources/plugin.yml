@@ -4,6 +4,8 @@ name: ${project.artifactId}
 api-version: '1.20'
 
 libraries:
+  
+  ## All Required Dependencides for MCP
   - io.modelcontextprotocol.sdk:mcp-core:1.1.2
   - io.modelcontextprotocol.sdk:mcp-json-jackson3:1.1.2
   - tools.jackson.core:jackson-core:3.0.3
@@ -19,3 +21,6 @@ libraries:
   - org.eclipse.jetty:jetty-http:11.0.20
   - org.eclipse.jetty:jetty-io:11.0.20
   - org.eclipse.jetty:jetty-security:11.0.20
+  
+  ## Experimental Libraries
+  - org.luaj:luaj-jse:3.0.1

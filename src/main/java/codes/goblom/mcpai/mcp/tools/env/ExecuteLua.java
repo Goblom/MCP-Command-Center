@@ -1,0 +1,121 @@
+/*
+ * The MIT License
+ *
+ * Copyright 2026 Bryan.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+package codes.goblom.mcpai.mcp.tools.env;
+
+import codes.goblom.mcpai.Configuration;
+import codes.goblom.mcpai.mcp.InputSchemaBuilder;
+import codes.goblom.mcpai.mcp.providers.ToolProvider;
+import codes.goblom.mcpai.mcp.tools.SharedToolData;
+import io.modelcontextprotocol.server.McpSyncServerExchange;
+import io.modelcontextprotocol.spec.McpSchema;
+import java.util.logging.Level;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaError;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.jse.CoerceJavaToLua;
+import org.luaj.vm2.lib.jse.JsePlatform;
+
+/**
+ *
+ * @author Bryan
+ */
+public class ExecuteLua extends ToolProvider {
+    
+    private static final String INPUT_SCHEMA = InputSchemaBuilder.builder()
+            .addRequiredProperty("code", InputSchemaBuilder.ParameterType.String)
+            .addPropertyDescription("code", "The Lua Code that we are to execute on the server.")
+            .toJson();
+    
+    private static Globals _globals = JsePlatform.standardGlobals();
+    
+    public ExecuteLua() {
+        super(
+                "execute_lua",
+                """
+                Run lua code on the server.
+                
+                Note: This is experimental and many things can go wrong.
+                      Please have the user review all code before executing this on the server.
+                
+                Special Functions:
+                 - import(String) ## Import a class. {bukkit}, {spigot}, {nms} can be used to shorten org.bukkit, org.spigotmc, net.minecraft
+                """,
+                INPUT_SCHEMA
+        );
+        
+        _globals.set("import", new OneArgFunction() {
+            @Override
+            public LuaValue call(LuaValue arg) {
+                Configuration.PLUGIN.debug(Level.INFO, "Calling Lua Function - import");
+                try {
+                    String path = arg.checkjstring();
+                    
+                    path = path.replace("{bukkit}", "org.bukkit");
+                    path = path.replace("{spigotmc}", "org.spigotmc");
+                    path = path.replace("{nms}", "net.minecraft");
+                    
+                    Class clazz = Class.forName(path);
+                    
+                    return CoerceJavaToLua.coerce(clazz);
+                } catch (Exception e) {
+                    e.printStackTrace();
+
+                    throw new LuaError(e.getMessage());
+                }
+            }
+        });
+        
+        _globals.set("print", new OneArgFunction() {
+            @Override
+            public LuaValue call(LuaValue lv) {
+                SharedToolData.COMMAND_SENDER.sendMessage(lv.checkjstring());
+                return null;
+            }
+            
+        });
+        
+        //TODO: Add more required classes if needed
+        for (String className : new String[] { "org.bukkit.Bukkit" }) {
+            try {
+                _globals.set("Bukkit", CoerceJavaToLua.coerce(Class.forName("org.bukkit.Bukkit")));
+            } catch (Exception e) {
+                Configuration.PLUGIN.debug(Level.WARNING, "Unable to load {0}. It must be declared manually in lua code.", className);
+            }
+        }
+    }
+
+    @Override
+    @RequireSyncMethod
+    public McpSchema.CallToolResult execute(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) throws Exception {
+        String luaCode = (String) request.arguments().get("code");
+        
+        LuaValue compiled = _globals.load(luaCode);
+        
+        compiled.call();
+        
+        return McpSchema.CallToolResult.builder()
+                .addTextContent("Success! (At least no errors)").build();
+    }
+}

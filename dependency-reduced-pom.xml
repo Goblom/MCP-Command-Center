@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>codes.goblom</groupId>
   <artifactId>MCP-AI-Plugin</artifactId>
-  <version>0.1.0</version>
+  <version>0.2.0</version>
   <build>
     <resources>
       <resource>
@@ -33,7 +33,13 @@
         </executions>
         <configuration>
           <artifactSet>
-            <includes />
+            <includes>
+              <include>party.iroiro.luajava:luajava</include>
+              <include>party.iroiro.luajava:lua51</include>
+              <include>party.iroiro.luajava:lua51-platform</include>
+              <include>com.badlogicgames.jnigen:jnigen-commons</include>
+              <include>com.badlogicgames.jnigen:jnigen-loader</include>
+            </includes>
           </artifactSet>
         </configuration>
       </plugin>
@@ -46,6 +52,50 @@
       </plugin>
     </plugins>
   </build>
+  <dependencies>
+    <dependency>
+      <groupId>io.modelcontextprotocol.sdk</groupId>
+      <artifactId>mcp-core</artifactId>
+      <version>1.1.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.modelcontextprotocol.sdk</groupId>
+      <artifactId>mcp-json-jackson3</artifactId>
+      <version>1.1.2</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>26.1.2-R0.1-SNAPSHOT</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <version>5.0.0</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-server</artifactId>
+      <version>11.0.20</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.jetty</groupId>
+      <artifactId>jetty-servlet</artifactId>
+      <version>11.0.20</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.luaj</groupId>
+      <artifactId>luaj-jse</artifactId>
+      <version>3.0.1</version>
+      <scope>compile</scope>
+    </dependency>
+  </dependencies>
   <properties>
     <maven.compiler.release>25</maven.compiler.release>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

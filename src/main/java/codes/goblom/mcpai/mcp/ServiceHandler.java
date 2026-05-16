@@ -27,6 +27,7 @@ import codes.goblom.mcpai.Configuration;
 import codes.goblom.mcpai.mcp.providers.PromptProvider;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.tools.entity.*;
+import codes.goblom.mcpai.mcp.tools.env.*;
 import codes.goblom.mcpai.mcp.tools.files.*;
 import codes.goblom.mcpai.mcp.tools.player.*;
 import codes.goblom.mcpai.mcp.tools.plugin.*;
@@ -73,6 +74,10 @@ public class ServiceHandler {
             add(new ListDirectory());
             add(new ReadFile());
             add(new WriteFile());
+            
+            if (Configuration.ENVIRONMENT_LUA) {
+                add(new ExecuteLua());
+            }
         }
     };
     

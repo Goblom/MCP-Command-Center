@@ -50,4 +50,6 @@ public class Configuration {
     public static String MCP_CONSOLE_NAME = "[LLM]";
     
     public static McpPlugin PLUGIN;
+    
+    public static boolean ENVIRONMENT_LUA = true;
 }

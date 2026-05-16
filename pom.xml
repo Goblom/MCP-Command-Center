@@ -3,7 +3,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>codes.goblom</groupId>
     <artifactId>MCP-AI-Plugin</artifactId>
-    <version>0.2.0</version>
+    <version>0.2.1</version>
     <packaging>jar</packaging>
     
     <properties>
@@ -42,6 +42,11 @@
             <groupId>org.eclipse.jetty</groupId>
             <artifactId>jetty-servlet</artifactId>
             <version>11.0.20</version>
+        </dependency>
+        <dependency>
+            <groupId>org.luaj</groupId>
+            <artifactId>luaj-jse</artifactId>
+            <version>3.0.1</version>
         </dependency>
     </dependencies>
     
@@ -86,6 +91,7 @@
                             <include>org.eclipse.jetty:jetty-http</include>
                             <include>org.eclipse.jetty:jetty-io</include>
                             <include>org.eclipse.jetty:jetty-security</include>
+                            <include>org.luaj:luaj-jse</include>
                         </includes>
                     </artifactSet>
                 </configuration>
