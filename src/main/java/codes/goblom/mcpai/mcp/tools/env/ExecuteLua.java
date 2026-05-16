@@ -29,11 +29,17 @@ import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.tools.SharedToolData;
 import io.modelcontextprotocol.server.McpSyncServerExchange;
 import io.modelcontextprotocol.spec.McpSchema;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaError;
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
+import org.luaj.vm2.lib.ZeroArgFunction;
 import org.luaj.vm2.lib.jse.CoerceJavaToLua;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
@@ -61,6 +67,7 @@ public class ExecuteLua extends ToolProvider {
                 
                 Special Functions:
                  - import(String) ## Import a class. {bukkit}, {spigot}, {nms} can be used to shorten org.bukkit, org.spigotmc, net.minecraft
+                 - getOnlinePlayers() ## Returns an array of Wrapped Player data. Needed since LuaJ has hard time with Collection
                 """,
                 INPUT_SCHEMA
         );
@@ -94,6 +101,22 @@ public class ExecuteLua extends ToolProvider {
                 return null;
             }
             
+        });
+        
+        _globals.set("getOnlinePlayers", new ZeroArgFunction() {
+            @Override
+            public LuaValue call() {
+                int count = 1;
+                LuaTable table = new LuaTable();
+                
+                List<Player> players = Bukkit.getOnlinePlayers().stream().collect(Collectors.toList());
+
+                for (Player player : players) {
+                    table.set(count++, CoerceJavaToLua.coerce(player));
+                }
+                
+                return table;
+            }
         });
         
         //TODO: Add more required classes if needed
