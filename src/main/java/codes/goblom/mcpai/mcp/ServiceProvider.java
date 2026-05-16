@@ -56,4 +56,5 @@ public interface ServiceProvider<RES extends McpSchema.Result, REQ extends McpSc
     @Override
     public RES apply(McpSyncServerExchange exchange, REQ request);
     
+    public boolean hasPermission(String token);
 }

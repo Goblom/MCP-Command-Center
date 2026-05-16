@@ -36,6 +36,11 @@ import java.util.List;
  */
 public abstract class PromptProvider implements ServiceProvider<McpSchema.GetPromptResult, McpSchema.GetPromptRequest> {
     
+    @Override
+    public final boolean hasPermission(String token) {
+        return true;
+    }
+    
     //TODO: Add support for other messages like...
     //      ImageContent, AudioContent, EmbeddedResource, ResourceLink
     static class PromptMessageBuilder {

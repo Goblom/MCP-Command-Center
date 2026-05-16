@@ -100,20 +100,33 @@ public abstract class ToolProvider implements ServiceProvider<McpSchema.CallTool
     }
 
     @Override
+    public final boolean hasPermission(String token) {
+        List<String> permissions = Configuration.TOKEN_PERMISSIONS.get(token);
+        
+        if (permissions == null || permissions.isEmpty()) {
+            return false;
+        }
+        
+        if (permissions.contains("tools.all") || permissions.contains("tools.*")) return true;
+        return !permissions.contains("-tools." + getName()) && permissions.contains("tools." + getName());
+    }
+    
+    @Override
     public final McpSchema.CallToolResult apply(McpSyncServerExchange exchange, McpSchema.CallToolRequest request) {
         Configuration.PLUGIN.debug(Level.INFO, "Calling {0} with args[{1}]", getName(), new Gson().toJson(request.arguments()));
         
         String token = ((String[]) exchange.transportContext().get("token"))[0];
-        List<String> permissions = Configuration.TOKEN_PERMISSIONS.get(token);
+//        List<String> permissions = Configuration.TOKEN_PERMISSIONS.get(token);
+//        
+//        if (permissions == null || permissions.isEmpty()) {
+//            return McpSchema.CallToolResult.builder()
+//                    .isError(true)
+//                    .addTextContent("Error: Invalid Permissions")
+//                    .build();
+//        }
         
-        if (permissions == null || permissions.isEmpty()) {
-            return McpSchema.CallToolResult.builder()
-                    .isError(true)
-                    .addTextContent("Error: Invalid Permissions")
-                    .build();
-        }
-        
-        if (!permissions.contains("tools.all") && !permissions.contains("tools." + getName())) {
+//        if (!permissions.contains("tools.all") && !permissions.contains("tools." + getName())) {
+        if (!hasPermission(token)) {
             return McpSchema.CallToolResult.builder()
                     .isError(true)
                     .addTextContent("Error: No Permissinos.")
