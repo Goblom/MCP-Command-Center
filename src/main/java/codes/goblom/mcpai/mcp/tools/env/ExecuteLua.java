@@ -64,6 +64,7 @@ public class ExecuteLua extends ToolProvider {
                 
                 Note: This is experimental and many things can go wrong.
                       Please have the user review all code before executing this on the server.
+                      This is also a known attack vector for bad actors. Give access cautiosly.
                 
                 Special Functions:
                  - import(String) ## Import a class. {bukkit}, {spigot}, {nms} can be used to shorten org.bukkit, org.spigotmc, net.minecraft

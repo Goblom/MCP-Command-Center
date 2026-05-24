@@ -21,38 +21,32 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package codes.goblom.mcpai;
+package codes.goblom.commandfactory;
 
-import com.google.common.collect.Lists;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  *
  * @author Bryan
  */
-public class Configuration {
+@Target(ElementType.METHOD)
+@Retention(RetentionPolicy.RUNTIME)
+public @interface CommandInfo {
     
-    public static int HTTP_PORT = 8080;
-    public static String MCP_PATH = "/mcp";
-    public static boolean DEBUG = true;
-    public static Random RANDOM = new Random();
-
-    public static Map<String, List<String>> TOKEN_PERMISSIONS = new HashMap<String, List<String>>() {
-        {
-            put("super-secret-token", Lists.newArrayList("tools.all", "prompts.all"));
-            put("permissions-test", Lists.newArrayList("prompts.all", "tools.list_plugins", "tools.get_logged_in_players_name"));
-        }
-    };
+    String name();
     
-    public static String MCP_CONSOLE_NAME = "[LLM]";
-    public static String COMMAND_PREFIX = "[MCC]";
+    String permission() default "";
     
-    public static CommandCenterPlugin PLUGIN;
+    String description() default "";
     
-    public static boolean ENVIRONMENT_LUA = true;
+    String[] alias() default { };
     
-    public static List<String> DISABLED_TOOLS = Lists.newArrayList();
+    String usage() default "";
+    
+    boolean async() default false;
+    
+    String noPermissionMessage() default "No Permissions!";
 }

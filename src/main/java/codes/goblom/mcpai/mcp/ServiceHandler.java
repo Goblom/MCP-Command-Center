@@ -24,7 +24,6 @@
 package codes.goblom.mcpai.mcp;
 
 import codes.goblom.mcpai.Configuration;
-import codes.goblom.mcpai.mcp.providers.PromptProvider;
 import codes.goblom.mcpai.mcp.providers.ToolProvider;
 import codes.goblom.mcpai.mcp.tools.entity.*;
 import codes.goblom.mcpai.mcp.tools.env.*;
@@ -34,10 +33,13 @@ import codes.goblom.mcpai.mcp.tools.plugin.*;
 import codes.goblom.mcpai.mcp.tools.server.*;
 import codes.goblom.mcpai.mcp.tools.world.*;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.spec.McpSchema;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 
 /**
@@ -45,7 +47,8 @@ import java.util.logging.Level;
  * @author Bryan
  */
 public class ServiceHandler {
-    
+        
+    private static final Map<String, McpServerFeatures.SyncToolSpecification> REGISTERED_TOOLS = Maps.newHashMap();
     static final List<ToolProvider> TOOLS = new ArrayList() {
         {
             add(new GetPlayerInfo());
@@ -82,23 +85,20 @@ public class ServiceHandler {
         }
     };
     
-    static final List<PromptProvider> PROMPTS = new ArrayList() {
-        {
-        
-        }
-    };
-    
     public static List<McpServerFeatures.SyncToolSpecification> getTools() {
         List<McpServerFeatures.SyncToolSpecification> wrappedTools = Lists.newArrayList();
         
         TOOLS.forEach((tool) -> {
             McpSchema.Tool.Builder builder = McpSchema.Tool.builder();
             
+            String nameUsed;
             if (tool.getName() != null && !tool.getName().isEmpty()) {
                 builder.name(tool.getName());
+                nameUsed = tool.getName();
             } else {
                 // Using class name with sometimes result in your LLM not recognizing it as a tool the first try
                 builder.name(tool.getClass().getSimpleName());
+                nameUsed = tool.getClass().getSimpleName();
             }
             
             if (tool.getInputSchema() != null && !tool.getInputSchema().isEmpty()) {
@@ -130,7 +130,11 @@ public class ServiceHandler {
                     tool
             );
             
-            wrappedTools.add(wrappedTool);
+            if (!Configuration.DISABLED_TOOLS.contains(nameUsed)) {
+                wrappedTools.add(wrappedTool);
+            }
+            
+            REGISTERED_TOOLS.put(nameUsed, wrappedTool);
             
             Configuration.PLUGIN.debug(Level.INFO, "Registered Tool {0}:{1}", tool.getClass().getSimpleName(), tool.getName());
         });
@@ -138,11 +142,11 @@ public class ServiceHandler {
         return wrappedTools;
     }
     
-    /**
-     * @deprecated Not Implemented
-     */
-    @Deprecated
-    public static List<McpServerFeatures.SyncPromptSpecification> getPrompts() {
-        return null;
+    public static Set<String> getRegisteredTools() {
+        return REGISTERED_TOOLS.keySet();
+    }
+    
+    public static McpServerFeatures.SyncToolSpecification getRegisteredToolObject(String name) {
+        return REGISTERED_TOOLS.get(name);
     }
 }

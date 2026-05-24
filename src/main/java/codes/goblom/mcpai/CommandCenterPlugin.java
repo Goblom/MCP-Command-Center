@@ -23,6 +23,8 @@
  */
 package codes.goblom.mcpai;
 
+import codes.goblom.commandfactory.CommandContext;
+import codes.goblom.commandfactory.CommandFactory;
 import codes.goblom.mcpai.mcp.ServiceHandler;
 import io.modelcontextprotocol.json.jackson3.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.json.schema.jackson3.DefaultJsonSchemaValidator;
@@ -41,10 +43,13 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import tools.jackson.databind.json.JsonMapper;
 import io.modelcontextprotocol.common.McpTransportContext;
+import io.modelcontextprotocol.server.McpServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.server.McpTransportContextExtractor;
 import jakarta.servlet.http.HttpServletRequest;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import org.bukkit.command.CommandSender;
 
 /**
  *
@@ -59,18 +64,39 @@ public class CommandCenterPlugin extends JavaPlugin {
     Server httpServer;
     ServletContextHandler contextHandler;
     
-    ServiceHandler toolHandler;
+    protected List<SyncToolSpecification> tools;
     
     @Override
     public void onLoad() {
         Configuration.PLUGIN = this;
+        CommandFactory mccCommands = new CommandFactory(this) {
+            @Override
+            public void sendMessage(CommandSender sender, String message) {
+                sender.sendMessage(Configuration.COMMAND_PREFIX + " " + message);
+            }
+
+            @Override
+            public void executeNoArgsWithStub(CommandContext context) {
+                if (context.isTabExecutor()) return;
+                
+                context.message("Available Commands: ");
+                getAvailableCommands().forEach((info) -> {
+                    context.message("|  - " + info.name() + (!info.usage().isEmpty() ? " " + info.usage() : ""));
+                });
+            }
+        };
+        
+        mccCommands.addExecutors(new CommandCenterCommands());
+        mccCommands.register("mcc");
     }
     
     @Override
-    public void onEnable() {        
+    public void onEnable() {
         jsonMapper = new JacksonMcpJsonMapper(
                 JsonMapper.builder().build()
         );
+        
+        tools = ServiceHandler.getTools();
         
         transportProvider = HttpServletStreamableServerTransportProvider.builder()
                 .jsonMapper(jsonMapper)
@@ -110,8 +136,7 @@ public class CommandCenterPlugin extends JavaPlugin {
                         .prompts(true)
 //                        .logging()
                         .build())
-                .tools(ServiceHandler.getTools())
-//                .prompts(ServiceHandler.getPrompts())
+                .tools(tools)
                 .build();
         
         this.httpServer = new Server(Configuration.HTTP_PORT);
@@ -122,7 +147,7 @@ public class CommandCenterPlugin extends JavaPlugin {
         this.contextHandler.addFilter(new FilterHolder(new TokenAuthFilter()), Configuration.MCP_PATH, EnumSet.of(DispatcherType.REQUEST));
         
         this.httpServer.setHandler(contextHandler);
-        
+
         try {
             this.httpServer.start();
         } catch (Exception e) {

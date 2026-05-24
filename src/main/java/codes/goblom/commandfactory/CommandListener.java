@@ -21,38 +21,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package codes.goblom.mcpai;
-
-import com.google.common.collect.Lists;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+package codes.goblom.commandfactory;
 
 /**
  *
  * @author Bryan
  */
-public class Configuration {
-    
-    public static int HTTP_PORT = 8080;
-    public static String MCP_PATH = "/mcp";
-    public static boolean DEBUG = true;
-    public static Random RANDOM = new Random();
-
-    public static Map<String, List<String>> TOKEN_PERMISSIONS = new HashMap<String, List<String>>() {
-        {
-            put("super-secret-token", Lists.newArrayList("tools.all", "prompts.all"));
-            put("permissions-test", Lists.newArrayList("prompts.all", "tools.list_plugins", "tools.get_logged_in_players_name"));
-        }
-    };
-    
-    public static String MCP_CONSOLE_NAME = "[LLM]";
-    public static String COMMAND_PREFIX = "[MCC]";
-    
-    public static CommandCenterPlugin PLUGIN;
-    
-    public static boolean ENVIRONMENT_LUA = true;
-    
-    public static List<String> DISABLED_TOOLS = Lists.newArrayList();
-}
+public interface CommandListener { }

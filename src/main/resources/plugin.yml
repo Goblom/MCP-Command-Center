@@ -1,4 +1,4 @@
-main: codes.goblom.mcpai.McpPlugin
+main: codes.goblom.mcpai.CommandCenterPlugin
 version: ${project.version}
 name: ${project.artifactId}
 api-version: '1.20'
