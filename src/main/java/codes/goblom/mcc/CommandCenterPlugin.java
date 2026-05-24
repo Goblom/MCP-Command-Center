@@ -26,6 +26,8 @@ package codes.goblom.mcc;
 import codes.goblom.factory.command.CommandContext;
 import codes.goblom.factory.command.CommandFactory;
 import codes.goblom.factory.config.ConfigurationFactory;
+import codes.goblom.mcc.commands.TokenCommands;
+import codes.goblom.mcc.commands.ToolCommands;
 import codes.goblom.mcc.mcp.ServiceHandler;
 import io.modelcontextprotocol.json.jackson3.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.json.schema.jackson3.DefaultJsonSchemaValidator;
@@ -44,9 +46,11 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import tools.jackson.databind.json.JsonMapper;
 import io.modelcontextprotocol.common.McpTransportContext;
+import io.modelcontextprotocol.server.McpServerFeatures;
 import io.modelcontextprotocol.server.McpServerFeatures.SyncToolSpecification;
 import io.modelcontextprotocol.server.McpTransportContextExtractor;
 import jakarta.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,7 +91,8 @@ public class CommandCenterPlugin extends JavaPlugin {
             }
         };
         
-        mccCommands.addExecutors(new CommandCenterCommands(this));
+        mccCommands.addExecutors(new TokenCommands(this));
+        mccCommands.addExecutors(new ToolCommands(this));
         mccCommands.register("mcc");
     }
     
@@ -172,6 +177,18 @@ public class CommandCenterPlugin extends JavaPlugin {
     
     public CommandCenterConfig getMCCConfig() {
         return this.ccConfig;
+    }
+    
+    public McpSyncServer getSyncServer() {
+        return this.syncServer;
+    }
+    
+    public List<McpServerFeatures.SyncToolSpecification> getTools() {
+        return new ArrayList() {
+            {
+                addAll(tools);
+            }
+        };
     }
     
     public void debug(Level level, String message) {
