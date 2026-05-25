@@ -157,7 +157,7 @@ public @interface ConfigValue {
                     tokens.add(section.get(key));
                 }
                 
-                map.put(key, map);
+                map.put(key, tokens);
             }
             
             return map;
