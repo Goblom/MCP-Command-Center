@@ -148,7 +148,7 @@ public class WrappedCommandSender implements CommandSender {
 
     @Override
     public String getName() {
-        return ((CommandCenterPlugin) JavaPlugin.getProvidingPlugin(WrappedCommandSender.class)).getMCCConfig().getConsolePrefix();
+        return ((CommandCenterPlugin) JavaPlugin.getProvidingPlugin(WrappedCommandSender.class)).getMCCConfig().getCommandPrefix();
     }
 
     @Override

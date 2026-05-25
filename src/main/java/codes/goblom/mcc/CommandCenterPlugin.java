@@ -26,8 +26,7 @@ package codes.goblom.mcc;
 import codes.goblom.factory.command.CommandContext;
 import codes.goblom.factory.command.CommandFactory;
 import codes.goblom.factory.config.ConfigurationFactory;
-import codes.goblom.mcc.commands.TokenCommands;
-import codes.goblom.mcc.commands.ToolCommands;
+import codes.goblom.mcc.commands.*;
 import codes.goblom.mcc.mcp.ServiceHandler;
 import io.modelcontextprotocol.json.jackson3.JacksonMcpJsonMapper;
 import io.modelcontextprotocol.json.schema.jackson3.DefaultJsonSchemaValidator;
@@ -77,14 +76,15 @@ public class CommandCenterPlugin extends JavaPlugin {
         CommandFactory mccCommands = new CommandFactory(this) {
             @Override
             public void sendMessage(CommandSender sender, String message) {
-                sender.sendMessage(getMCCConfig().getConsolePrefix() + " " + message);
+                sender.sendMessage(getMCCConfig().getCommandPrefix() + " " + message);
             }
 
             @Override
             public void executeNoArgsWithStub(CommandContext context) {
                 if (context.isTabExecutor()) return;
                 
-                context.message("Available Commands: ");
+                context.message("Available Commands:");
+                context.message("===============================");
                 getAvailableCommands().forEach((info) -> {
                     context.message("|  - " + info.name() + (!info.usage().isEmpty() ? " " + info.usage() : ""));
                 });
@@ -93,6 +93,7 @@ public class CommandCenterPlugin extends JavaPlugin {
         
         mccCommands.addExecutors(new TokenCommands(this));
         mccCommands.addExecutors(new ToolCommands(this));
+        mccCommands.addExecutors(new ConfigCommands(this));
         mccCommands.register("mcc");
     }
     

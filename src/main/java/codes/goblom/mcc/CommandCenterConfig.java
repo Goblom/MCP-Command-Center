@@ -75,7 +75,7 @@ public class CommandCenterConfig {
     )
     private Map<String, List<String>> tokenPermissions = new HashMap() {
         {
-            put("super-secret-token", Lists.newArrayList("tools.all"));
+            put("super-secret-token", "tools.all");
             put("limited-permission", Lists.newArrayList("tools.get_logged_in_players", "tools.get_player_info", "tools.teleport_player", "tools.get_player_location"));
         }
     };
@@ -84,7 +84,7 @@ public class CommandCenterConfig {
     private String mcpConsoleName = "[LLM]";
     
     @ConfigValue("Command Prefix") //Do we need to change this in the config?
-    private String consolePrefix = "[MCC]";
+    private String commandPrefix = "[MCC]";
     
     // Return:
     //     Should we allow this in config and potentially open up an
@@ -122,8 +122,8 @@ public class CommandCenterConfig {
         return this.mcpConsoleName;
     }
 
-    public String getConsolePrefix() {
-        return this.consolePrefix;
+    public String getCommandPrefix() {
+        return this.commandPrefix;
     }
 
     public boolean isLuaEnabled() {
