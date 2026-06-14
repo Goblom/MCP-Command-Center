@@ -29,10 +29,11 @@ import codes.goblom.factory.command.CommandListener;
 import codes.goblom.factory.config.ConfigValue;
 import codes.goblom.factory.config.ConfigurationFactory;
 import codes.goblom.mcc.CommandCenterPlugin;
-import codes.goblom.mcc.mcp.ServiceProvider;
 import codes.goblom.mcc.mcp.providers.ToolProvider;
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -134,13 +135,49 @@ public class ConfigCommands implements CommandListener {
             context.suggest("[number]");
             String numStr = context.getArg(1);
             
-            // TODO
+            try {
+                int number = Integer.parseInt(numStr);
+                
+                field.set(plugin.getMCCConfig(), number);
+                context.message("Updated " + fieldName + " to " + number + ".");
+            } catch (Exception e) {
+                e.printStackTrace();
+                context.message("Error: Must be a number without a decimal.");
+            }
         } else if (type == boolean.class || type == Boolean.class) {
-            context.suggest("true");
-            context.suggest("false");
+            Map<String, Boolean> bools = new HashMap() {
+                {
+                    put("true", true);
+                    put("false", false);
+                    put("yes", true);
+                    put("no", false);
+                    put("t", true);
+                    put("f", false);
+                    put("y", true);
+                    put("n", false);
+                }
+            };
             
-            // TODO
-        } else if (Map.class.isAssignableFrom(type)) { // Should be if type is instanceof Map
+            for (String key : bools.keySet()) {
+                context.suggest(key);
+            }
+            
+            String boolStr = context.getArg(1);
+            
+            if (!bools.containsKey(boolStr)) {
+                context.message("Not a valid boolean.");
+                return;
+            }
+            
+            boolean bool = bools.get(boolStr);
+            
+            try {
+                field.set(plugin.getMCCConfig(), bool);
+            } catch (Exception e) {
+                e.printStackTrace();
+                context.message("Error updating boolean for " + fieldName + ". Check logs.");
+            }
+        } else if (Map.class.isAssignableFrom(type) /* || field.get(plugin.getMCCConfig()) instanceof Map */) { // Should be if type is instanceof Map
             String action = context.getArg(1);
 
             // This doesnt suggest
@@ -189,8 +226,13 @@ public class ConfigCommands implements CommandListener {
                         return;
                     }
 
-                    // TODO: Needs to use Field Accessor
-                    plugin.getMCCConfig().getTokenPermissions().put(token, nodes);
+//                    plugin.getMCCConfig().getTokenPermissions().put(token, nodes);
+                    try {
+                        ((Map) field.get(plugin.getMCCConfig())).put(token, nodes);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        context.message("Error updating map for " + fieldName + ". Check Logs.");
+                    }
                     break;
                 case "remove":
                     if (context.isTabExecutor()) {
@@ -203,8 +245,14 @@ public class ConfigCommands implements CommandListener {
                     }
 
                     // TODO: Needs to use Field Accessor
-                    plugin.getMCCConfig().getTokenPermissions().remove(token);
-                    context.message("Removed Token: " + token);
+//                    plugin.getMCCConfig().getTokenPermissions().remove(token);
+                    try {
+                        ((Map) field.get(plugin.getMCCConfig())).remove(token);
+                        context.message("Removed Token: " + token);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        context.message("Error updating map for " + fieldName + ". Check Logs.");
+                    }
                     break;
                 default:
                     if (context.isTabExecutor()) {
@@ -214,6 +262,21 @@ public class ConfigCommands implements CommandListener {
                     context.message("Unknown action: " + action);
                     break;
             }
+//        }  else if (Collection.class.isAssignableFrom(type) /* || field.get(plugin.getMCCConfig()) instanceof Collection */) { // Should be if type is instanceof Collection
+//            String action = context.getArg(1);
+//            
+//            if (context.argsLength() == 2) {
+//                context.suggest("add");
+//                context.suggest("remove");
+//            }
+//            
+//            switch (action.toLowerCase()) {
+//                case "add":
+//                case "remove":
+//                    //TODO
+//            }
+        } else {
+            context.message("Unknown field type " + type + " for " + fieldName);
         }
     }
 }
