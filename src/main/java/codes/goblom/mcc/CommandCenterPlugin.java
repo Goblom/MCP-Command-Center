@@ -25,7 +25,6 @@ package codes.goblom.mcc;
 
 import codes.goblom.factory.command.CommandContext;
 import codes.goblom.factory.command.CommandFactory;
-import codes.goblom.factory.config.ConfigurationFactory;
 import codes.goblom.mcc.commands.*;
 import codes.goblom.mcc.mcp.ServiceHandler;
 import io.modelcontextprotocol.json.jackson3.JacksonMcpJsonMapper;
@@ -69,7 +68,7 @@ public class CommandCenterPlugin extends JavaPlugin {
     ServletContextHandler contextHandler;
     
     protected List<SyncToolSpecification> tools;
-    protected CommandCenterConfig ccConfig = new CommandCenterConfig();
+    protected CommandCenterConfig ccConfig;
     
     @Override
     public void onLoad() {
@@ -103,8 +102,8 @@ public class CommandCenterPlugin extends JavaPlugin {
                 JsonMapper.builder().build()
         );
         
-        ConfigurationFactory.loadConfig(this, ccConfig);
-        tools = ServiceHandler.getTools();
+        this.ccConfig = new CommandCenterConfig().load(this);
+        this.tools = ServiceHandler.getTools();
         
         transportProvider = HttpServletStreamableServerTransportProvider.builder()
                 .jsonMapper(jsonMapper)

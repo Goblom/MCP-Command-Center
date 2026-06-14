@@ -26,13 +26,11 @@ package codes.goblom.mcc.commands;
 import codes.goblom.factory.command.CommandContext;
 import codes.goblom.factory.command.CommandInfo;
 import codes.goblom.factory.command.CommandListener;
-import codes.goblom.factory.config.ConfigValue;
-import codes.goblom.factory.config.ConfigurationFactory;
 import codes.goblom.mcc.CommandCenterPlugin;
+import codes.goblom.mcc.JellyConfiguration.ConfigValue;
 import codes.goblom.mcc.mcp.providers.ToolProvider;
 import java.lang.reflect.Field;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +56,7 @@ public class ConfigCommands implements CommandListener {
     public void saveConfig(CommandContext context) {
         if (context.isTabExecutor()) return;
         
-        ConfigurationFactory.saveConfig(plugin, plugin.getMCCConfig());
+        plugin.getMCCConfig().save(plugin);
     }
     
     @CommandInfo(
@@ -70,7 +68,7 @@ public class ConfigCommands implements CommandListener {
     public void loadConfig(CommandContext context) {
         if (context.isTabExecutor()) return;
         
-        ConfigurationFactory.loadConfig(plugin, plugin.getMCCConfig());
+        plugin.getMCCConfig().load(plugin);
     }
     
     // TODO: Buggy, not completed

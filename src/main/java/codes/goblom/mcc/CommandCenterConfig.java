@@ -23,8 +23,7 @@
  */
 package codes.goblom.mcc;
 
-import codes.goblom.factory.config.ConfigFile;
-import codes.goblom.factory.config.ConfigValue;
+import codes.goblom.mcc.JellyConfiguration.ConfigSource;
 import com.google.common.collect.Lists;
 import java.util.HashMap;
 import java.util.List;
@@ -35,10 +34,11 @@ import java.util.Random;
  *
  * @author Bryan
  */
-@ConfigFile("config.yml")
-public class CommandCenterConfig {
+@ConfigSource("config.yml")
+public class CommandCenterConfig implements JellyConfiguration {
     
-    // Can keep this static, dont need to save it
+    // Can keep this static
+    // Dont add @ConfigValue, dont need to save it
     public static Random RANDOM = new Random();
     
     @ConfigValue(
